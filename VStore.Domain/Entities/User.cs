@@ -23,4 +23,5 @@ public class User : EntityBase<Guid>, IDateTracking, ISoftDelete
     public Role Role { get; set; }
     public Sex Sex { get; set; }
     public virtual Customer? Customer { get; set; }
+    public virtual ICollection<RefreshToken> RefreshTokens { get; set; } = [];
 }
