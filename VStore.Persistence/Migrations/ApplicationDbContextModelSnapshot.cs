@@ -372,9 +372,6 @@ namespace VStore.Persistence.Migrations
                     b.Property<string>("FirstName")
                         .HasColumnType("nvarchar(255)");
 
-                    b.Property<string>("ForgetPasswordCode")
-                        .HasColumnType("varchar(6)");
-
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
 
@@ -393,6 +390,12 @@ namespace VStore.Persistence.Migrations
                     b.Property<string>("Password")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ResetPasswordCode")
+                        .HasColumnType("varchar(6)");
+
+                    b.Property<int>("Role")
+                        .HasColumnType("int");
 
                     b.Property<int>("Sex")
                         .HasColumnType("int");
