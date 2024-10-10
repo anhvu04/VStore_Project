@@ -26,6 +26,6 @@ public class ValidationBehavior<TRequest, TResponse>(IValidator<TRequest>? valid
             .Select(error => new Error(error.ErrorCode, error.ErrorMessage))
             .ToArray();
 
-        return (dynamic)new ValidationError(errors);
+        return (TResponse)(object)Result.Failure(new ValidationError(errors));
     }
 }
