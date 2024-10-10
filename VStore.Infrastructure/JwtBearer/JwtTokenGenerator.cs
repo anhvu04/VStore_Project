@@ -32,6 +32,13 @@ public class JwtTokenGenerator : IJwtTokenGenerator
         return new JwtSecurityTokenHandler().WriteToken(token);
     }
 
+    public Task<DateTime> GetExpirationDate(string token)
+    {
+        var handler = new JwtSecurityTokenHandler();
+        var jsonToken = handler.ReadToken(token) as JwtSecurityToken;
+        return Task.FromResult(jsonToken?.ValidTo ?? DateTime.MinValue);
+    }
+
     private int GetExpiry(TokenType tokenType) => tokenType switch
     {
         TokenType.Access => int.Parse(_configuration["Jwt:AccessTokenLifeTime"]!),

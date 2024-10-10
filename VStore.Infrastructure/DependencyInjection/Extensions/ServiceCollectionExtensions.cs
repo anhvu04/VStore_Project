@@ -2,6 +2,9 @@ using System.Text;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
+using VStore.Application.Abstractions.Authentication;
+using VStore.Domain.AuthenticationScheme;
+using VStore.Infrastructure.JwtBearer;
 
 namespace VStore.Infrastructure.DependencyInjection.Extensions;
 
@@ -17,7 +20,7 @@ public static class ServiceCollectionExtensions
         services
             .AddAuthentication()
             .AddJwtBearer(
-                "Access",
+                AuthenticationScheme.Access,
                 o =>
                 {
                     o.TokenValidationParameters =
@@ -73,5 +76,6 @@ public static class ServiceCollectionExtensions
         //             };
         //     }
         // );
+        services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
     }
 }
