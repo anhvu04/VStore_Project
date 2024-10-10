@@ -7,4 +7,5 @@ public interface IJwtTokenGenerator
 {
     Task<string> GenerateToken(User user, TokenType tokenType);
     Task<DateTime> GetExpirationDate(string token);
+    string CreateVerifyCode();
 }

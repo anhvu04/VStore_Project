@@ -1,6 +1,6 @@
 namespace VStore.Application.Usecases.Authentication.Common;
 
-public class LoginResponseModel
+public record LoginResponseModel
 {
     public Guid UserId { get; set; }
     public string FirstName { get; set; }

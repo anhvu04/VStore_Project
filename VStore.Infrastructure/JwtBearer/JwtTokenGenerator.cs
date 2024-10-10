@@ -12,6 +12,7 @@ namespace VStore.Infrastructure.JwtBearer;
 public class JwtTokenGenerator : IJwtTokenGenerator
 {
     private readonly IConfiguration _configuration;
+    private const string Code = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
 
     public JwtTokenGenerator(IConfiguration configuration)
     {
@@ -37,6 +38,18 @@ public class JwtTokenGenerator : IJwtTokenGenerator
         var handler = new JwtSecurityTokenHandler();
         var jsonToken = handler.ReadToken(token) as JwtSecurityToken;
         return Task.FromResult(jsonToken?.ValidTo ?? DateTime.MinValue);
+    }
+
+    public string CreateVerifyCode()
+    {
+        var code = new StringBuilder();
+        var random = new Random();
+        for (var i = 0; i < 6; i++)
+        {
+            code.Append(Code[random.Next(Code.Length)]);
+        }
+
+        return code.ToString();
     }
 
     private int GetExpiry(TokenType tokenType) => tokenType switch
