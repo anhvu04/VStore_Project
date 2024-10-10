@@ -2,7 +2,7 @@ namespace VStore.Domain.Shared;
 
 public class Result
 {
-    protected bool IsSuccess { get; }
+    public bool IsSuccess { get; }
     public Error? Error { get; }
 
     protected Result(bool isSuccess, Error? error)
