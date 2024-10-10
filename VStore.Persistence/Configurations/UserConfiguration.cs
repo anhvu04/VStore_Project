@@ -9,5 +9,6 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
     public void Configure(EntityTypeBuilder<User> builder)
     {
         builder.Property(u => u.Sex).HasConversion<int>();
+        builder.Property(u => u.Role).HasConversion<int>();
     }
 }
