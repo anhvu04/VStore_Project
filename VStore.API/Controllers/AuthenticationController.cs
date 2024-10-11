@@ -2,6 +2,7 @@ using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using VStore.Application.Usecases.Authentication.Command.Login;
 using VStore.Application.Usecases.Authentication.Command.Register;
+using VStore.Application.Usecases.Authentication.Command.ResetPassword;
 using VStore.Application.Usecases.Authentication.Command.Verify;
 
 namespace VStore.API.Controllers
@@ -27,6 +28,15 @@ namespace VStore.API.Controllers
         [HttpPost("verify")]
         public async Task<IActionResult> VerifyAccount([FromQuery] VerifyCommand command)
         {
+            var res = await Sender.Send(command);
+            return res.IsSuccess ? Ok() : BadRequest(res.Error);
+        }
+
+        [HttpPost("reset-password")]
+        public async Task<IActionResult> ResetPassword([FromQuery] string token,
+            [FromBody] ResetPasswordCommand command)
+        {
+            command = command with { Token = token };
             var res = await Sender.Send(command);
             return res.IsSuccess ? Ok() : BadRequest(res.Error);
         }

@@ -32,18 +32,14 @@ public class VerifyCommandHandler : ICommandHandler<VerifyCommand>
 
         var userId = Guid.Parse(isVerify.Value?.Claims.First(x => x.Type == "UserId").Value ?? string.Empty);
         var user = await _userRepository.FindByIdAsync(userId, cancellationToken);
-        if (user == null)
+        var verifyCode = isVerify.Value?.Claims.First(x => x.Type == "Token").Value ?? string.Empty;
+        var isVerifyCode = _jwtTokenGenerator.VerifyCode(user, verifyCode, true, cancellationToken);
+        if (!isVerifyCode.IsSuccess)
         {
-            return Result.Failure(DomainError.CommonError.NotFound(nameof(userId)));
+            return isVerifyCode;
         }
 
-        var verifyCode = isVerify.Value?.Claims.First(x => x.Type == "Token").Value;
-        if (verifyCode != user.VerificationCode)
-        {
-            return Result.Failure(DomainError.Authentication.InvalidCode);
-        }
-
-        user.IsActive = true;
+        user!.IsActive = true;
         user.VerificationCode = null;
         _userRepository.Update(user);
         await _unitOfWork.SaveChangesAsync(false, true, cancellationToken);

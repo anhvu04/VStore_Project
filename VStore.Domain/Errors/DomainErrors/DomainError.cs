@@ -27,4 +27,13 @@ public static class DomainError
         public static readonly Error InvalidCode =
             new("Error.Authentication.InvalidCode", "Invalid code.");
     }
+
+    public static class User
+    {
+        public static readonly Error Banned =
+            new("Error.User.Banned", "User is banned.");
+
+        public static readonly Error NotActive =
+            new("Error.User.NotActive", "User is not active.");
+    }
 }

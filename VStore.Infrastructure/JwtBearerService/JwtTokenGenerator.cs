@@ -4,6 +4,7 @@ using System.Text;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using VStore.Application.Abstractions.Authentication;
+using VStore.Domain.Abstractions.Repositories;
 using VStore.Domain.Entities;
 using VStore.Domain.Enums;
 using VStore.Domain.Errors.DomainErrors;
@@ -14,11 +15,13 @@ namespace VStore.Infrastructure.JwtBearerService;
 public class JwtTokenGenerator : IJwtTokenGenerator
 {
     private readonly IConfiguration _configuration;
+    private readonly IUserRepository _userRepository;
     private const string Code = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
 
-    public JwtTokenGenerator(IConfiguration configuration)
+    public JwtTokenGenerator(IConfiguration configuration, IUserRepository userRepository)
     {
         _configuration = configuration;
+        _userRepository = userRepository;
     }
 
     public async Task<string> GenerateToken(User user, TokenType tokenType)
@@ -83,10 +86,40 @@ public class JwtTokenGenerator : IJwtTokenGenerator
         {
             return Result<ClaimsPrincipal>.Failure(DomainError.Authentication.InvalidToken);
         }
-        catch (Exception e)
+        catch (Exception)
         {
             return Result<ClaimsPrincipal>.Failure(DomainError.Authentication.InvalidToken);
         }
+    }
+
+    public Result VerifyCode(User? user, string token, bool isVerify,
+        CancellationToken cancellationToken)
+    {
+        if (user == null)
+        {
+            return Result.Failure(DomainError.CommonError.NotFound(nameof(user)));
+        }
+
+        if (user.IsBanned)
+        {
+            return Result.Failure(DomainError.User.Banned);
+        }
+
+        if (!isVerify)
+        {
+            if (!user.IsActive)
+            {
+                return Result.Failure(DomainError.User.NotActive);
+            }
+        }
+
+        var verifyCode = isVerify ? user.VerificationCode : user.ResetPasswordCode;
+        if (verifyCode != token)
+        {
+            return Result.Failure(DomainError.Authentication.InvalidCode);
+        }
+
+        return Result.Success();
     }
 
     private int GetExpiry(TokenType tokenType) => tokenType switch

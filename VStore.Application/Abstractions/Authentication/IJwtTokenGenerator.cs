@@ -11,4 +11,7 @@ public interface IJwtTokenGenerator
     Task<DateTime> GetExpirationDate(string token);
     string CreateVerifyCode();
     Result<ClaimsPrincipal> VerifyToken(string token, bool isVerify);
+
+    Result VerifyCode(User? user, string token, bool isVerify,
+        CancellationToken cancellationToken = default);
 }
