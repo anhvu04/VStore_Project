@@ -1,6 +1,6 @@
 using VStore.Application.Abstractions.BCrypt;
 
-namespace VStore.Infrastructure.BCryptHash;
+namespace VStore.Infrastructure.BCryptService;
 
 public class BCryptPasswordHasher : IPasswordHasher
 {

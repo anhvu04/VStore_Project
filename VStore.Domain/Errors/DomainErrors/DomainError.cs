@@ -4,18 +4,27 @@ namespace VStore.Domain.Errors.DomainErrors;
 
 public static class DomainError
 {
+    public static class CommonError
+    {
+        public static Error NotFound(string value) =>
+            new($"Error.NotFound.{value}", $"{value} not found.");
+
+        public static Error AlreadyExists(string value) =>
+            new($"Error.AlreadyExists.{value}", $"{value} already exists.");
+    }
+
     public static class Authentication
     {
         public static readonly Error IncorrectUsernameOrPassword =
-            new("Authentication.IncorrectUsernameOrPassword", "Incorrect username or password.");
+            new("Error.Authentication.IncorrectUsernameOrPassword", "Incorrect username or password.");
 
-        public static readonly Error UsernameAlreadyExists =
-            new("Authentication.UsernameAlreadyExists", "Username already exists.");
+        public static readonly Error InvalidToken =
+            new("Error.Authentication.InvalidToken", "Invalid token.");
 
-        public static readonly Error EmailAlreadyExists =
-            new("Authentication.EmailAlreadyExists", "Email already exists.");
+        public static readonly Error TokenExpired =
+            new("Error.Authentication.TokenExpired", "Token expired.");
 
-        public static readonly Error PhoneNumberAlreadyExists =
-            new("Authentication.PhoneNumberAlreadyExists", "Phone number already exists.");
+        public static readonly Error InvalidCode =
+            new("Error.Authentication.InvalidCode", "Invalid code.");
     }
 }
