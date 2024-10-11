@@ -6,8 +6,10 @@ using Microsoft.IdentityModel.Tokens;
 using VStore.Application.Abstractions.Authentication;
 using VStore.Domain.Entities;
 using VStore.Domain.Enums;
+using VStore.Domain.Errors.DomainErrors;
+using VStore.Domain.Shared;
 
-namespace VStore.Infrastructure.JwtBearer;
+namespace VStore.Infrastructure.JwtBearerService;
 
 public class JwtTokenGenerator : IJwtTokenGenerator
 {
@@ -50,6 +52,41 @@ public class JwtTokenGenerator : IJwtTokenGenerator
         }
 
         return code.ToString();
+    }
+
+    public Result<ClaimsPrincipal> VerifyToken(string token, bool isVerify)
+    {
+        var handler = new JwtSecurityTokenHandler();
+        var key = GetKey(isVerify ? TokenType.Verification : TokenType.ResetPassword);
+        var validationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = false,
+            ValidateLifetime = true,
+            ValidIssuer = _configuration["Jwt:Issuer"],
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey =
+                new SymmetricSecurityKey(
+                    Encoding.UTF8.GetBytes(key)),
+            ClockSkew = TimeSpan.FromMinutes(0)
+        };
+        try
+        {
+            var claims = handler.ValidateToken(token, validationParameters, out _);
+            return Result<ClaimsPrincipal>.Success(claims);
+        }
+        catch (SecurityTokenExpiredException)
+        {
+            return Result<ClaimsPrincipal>.Failure(DomainError.Authentication.TokenExpired);
+        }
+        catch (SecurityTokenInvalidSignatureException)
+        {
+            return Result<ClaimsPrincipal>.Failure(DomainError.Authentication.InvalidToken);
+        }
+        catch (Exception e)
+        {
+            return Result<ClaimsPrincipal>.Failure(DomainError.Authentication.InvalidToken);
+        }
     }
 
     private int GetExpiry(TokenType tokenType) => tokenType switch
