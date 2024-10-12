@@ -97,20 +97,12 @@ public class JwtTokenGenerator : IJwtTokenGenerator
     {
         if (user == null)
         {
-            return Result.Failure(DomainError.CommonError.NotFound(nameof(user)));
+            return Result.Failure(DomainError.CommonError.NotFound(nameof(User)));
         }
 
         if (user.IsBanned)
         {
             return Result.Failure(DomainError.User.Banned);
-        }
-
-        if (!isVerify)
-        {
-            if (!user.IsActive)
-            {
-                return Result.Failure(DomainError.User.NotActive);
-            }
         }
 
         var verifyCode = isVerify ? user.VerificationCode : user.ResetPasswordCode;

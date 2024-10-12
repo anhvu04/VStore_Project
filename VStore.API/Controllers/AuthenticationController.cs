@@ -1,5 +1,6 @@
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using VStore.Application.Usecases.Authentication.Command.ForgotPassword;
 using VStore.Application.Usecases.Authentication.Command.Login;
 using VStore.Application.Usecases.Authentication.Command.Register;
 using VStore.Application.Usecases.Authentication.Command.ResetPassword;
@@ -37,6 +38,13 @@ namespace VStore.API.Controllers
             [FromBody] ResetPasswordCommand command)
         {
             command = command with { Token = token };
+            var res = await Sender.Send(command);
+            return res.IsSuccess ? Ok() : BadRequest(res.Error);
+        }
+
+        [HttpPost("forgot-password")]
+        public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordCommand command)
+        {
             var res = await Sender.Send(command);
             return res.IsSuccess ? Ok() : BadRequest(res.Error);
         }
