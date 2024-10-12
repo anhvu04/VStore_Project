@@ -1,10 +1,14 @@
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using VStore.Application.CoreHelper;
 using VStore.Application.Usecases.Authentication.Command.ForgotPassword;
 using VStore.Application.Usecases.Authentication.Command.Login;
+using VStore.Application.Usecases.Authentication.Command.RefreshToken;
 using VStore.Application.Usecases.Authentication.Command.Register;
 using VStore.Application.Usecases.Authentication.Command.ResetPassword;
 using VStore.Application.Usecases.Authentication.Command.Verify;
+using VStore.Domain.AuthenticationScheme;
 
 namespace VStore.API.Controllers
 {
@@ -47,6 +51,16 @@ namespace VStore.API.Controllers
         {
             var res = await Sender.Send(command);
             return res.IsSuccess ? Ok() : BadRequest(res.Error);
+        }
+
+        [HttpGet("refresh-token")]
+        [Authorize(AuthenticationSchemes = AuthenticationScheme.Refresh)]
+        public async Task<IActionResult> RefreshToken()
+        {
+            var token = CoreHelper.GetTokenFromContext(HttpContext);
+            var command = new RefreshTokenCommand(token);
+            var res = await Sender.Send(command);
+            return res.IsSuccess ? Ok(res.Value) : BadRequest(res.Error);
         }
     }
 }

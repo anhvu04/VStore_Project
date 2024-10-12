@@ -57,10 +57,10 @@ public class JwtTokenGenerator : IJwtTokenGenerator
         return code.ToString();
     }
 
-    public Result<ClaimsPrincipal> VerifyToken(string token, bool isVerify)
+    public Result<ClaimsPrincipal> VerifyToken(string token, TokenType tokenType)
     {
         var handler = new JwtSecurityTokenHandler();
-        var key = GetKey(isVerify ? TokenType.Verification : TokenType.ResetPassword);
+        var key = GetKey(tokenType);
         var validationParameters = new TokenValidationParameters
         {
             ValidateIssuer = true,
@@ -112,6 +112,24 @@ public class JwtTokenGenerator : IJwtTokenGenerator
         }
 
         return Result.Success();
+    }
+
+    public async Task<User?> GetUserByToken(string token)
+    {
+        var handler = new JwtSecurityTokenHandler();
+        if (!handler.CanReadToken(token))
+        {
+            return null;
+        }
+
+        var jwtToken = handler.ReadToken(token) as JwtSecurityToken;
+        if (jwtToken == null)
+        {
+            return null;
+        }
+
+        var userId = jwtToken.Claims.FirstOrDefault(x => x.Type == "UserId")?.Value;
+        return await _userRepository.FindByIdAsync(Guid.Parse(userId ?? string.Empty));
     }
 
     private int GetExpiry(TokenType tokenType) => tokenType switch

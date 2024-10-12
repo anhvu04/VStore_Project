@@ -48,7 +48,7 @@ public class LoginCommandHandler : ICommandHandler<LoginCommand, LoginResponseMo
         var exp = await _jwtTokenGenerator.GetExpirationDate(refreshToken);
 
         // add refresh token to db
-        var nRefreshToken = new RefreshToken
+        var nRefreshToken = new Domain.Entities.RefreshToken
         {
             Token = refreshToken,
             Expires = exp,
