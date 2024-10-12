@@ -3,6 +3,7 @@ using VStore.Application.Abstractions.Authentication;
 using VStore.Application.Abstractions.MediatR;
 using VStore.Domain.Abstractions;
 using VStore.Domain.Abstractions.Repositories;
+using VStore.Domain.Enums;
 using VStore.Domain.Errors.DomainErrors;
 using VStore.Domain.Shared;
 
@@ -24,7 +25,7 @@ public class VerifyCommandHandler : ICommandHandler<VerifyCommand>
 
     public async Task<Result> Handle(VerifyCommand request, CancellationToken cancellationToken)
     {
-        var isVerify = _jwtTokenGenerator.VerifyToken(request.Token, true);
+        var isVerify = _jwtTokenGenerator.VerifyToken(request.Token, TokenType.Verification);
         if (!isVerify.IsSuccess)
         {
             return isVerify;

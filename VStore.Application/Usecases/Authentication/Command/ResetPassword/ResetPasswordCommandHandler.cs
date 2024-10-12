@@ -3,6 +3,7 @@ using VStore.Application.Abstractions.BCrypt;
 using VStore.Application.Abstractions.MediatR;
 using VStore.Domain.Abstractions;
 using VStore.Domain.Abstractions.Repositories;
+using VStore.Domain.Enums;
 using VStore.Domain.Errors.DomainErrors;
 using VStore.Domain.Shared;
 
@@ -26,7 +27,7 @@ public class ResetPasswordCommandHandler : ICommandHandler<ResetPasswordCommand>
 
     public async Task<Result> Handle(ResetPasswordCommand request, CancellationToken cancellationToken)
     {
-        var isVerify = _tokenGenerator.VerifyToken(request.Token!, false);
+        var isVerify = _tokenGenerator.VerifyToken(request.Token!, TokenType.ResetPassword);
         if (!isVerify.IsSuccess)
         {
             return isVerify;

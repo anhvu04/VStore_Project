@@ -44,6 +44,24 @@ public static class ServiceCollectionExtensions
                             ClockSkew = TimeSpan.FromMinutes(0)
                         };
                 }
+            ).AddJwtBearer(
+                AuthenticationScheme.Refresh,
+                o =>
+                {
+                    o.TokenValidationParameters =
+                        new TokenValidationParameters
+                        {
+                            ValidateIssuer = true,
+                            ValidateAudience = false,
+                            ValidateLifetime = true,
+                            ValidIssuer = configuration["Jwt:Issuer"],
+                            ValidateIssuerSigningKey = true,
+                            IssuerSigningKey = new SymmetricSecurityKey(
+                                Encoding.UTF8.GetBytes(configuration["Jwt:RefreshTokenKey"]!)
+                            ),
+                            ClockSkew = TimeSpan.FromMinutes(0)
+                        };
+                }
             );
     }
 
