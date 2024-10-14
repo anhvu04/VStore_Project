@@ -8,7 +8,6 @@
 
     <ItemGroup>
       <Folder Include="DependencyInjection\Options\" />
-      <Folder Include="Repositories\" />
     </ItemGroup>
 
     <ItemGroup>

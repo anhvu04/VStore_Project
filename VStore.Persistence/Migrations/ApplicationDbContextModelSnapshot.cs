@@ -159,7 +159,7 @@ namespace VStore.Persistence.Migrations
                     b.Property<string>("Address")
                         .HasColumnType("nvarchar(255)");
 
-                    b.Property<DateOnly?>("BirthDate")
+                    b.Property<DateOnly?>("DateOfBirth")
                         .HasColumnType("date");
 
                     b.Property<string>("Email")
@@ -169,8 +169,9 @@ namespace VStore.Persistence.Migrations
                     b.Property<string>("GoogleId")
                         .HasColumnType("nvarchar(255)");
 
-                    b.Property<int>("PhoneNumber")
-                        .HasColumnType("int");
+                    b.Property<string>("PhoneNumber")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ProfilePictureUrl")
                         .HasColumnType("varchar(255)");
@@ -357,6 +358,29 @@ namespace VStore.Persistence.Migrations
                     b.ToTable("Products");
                 });
 
+            modelBuilder.Entity("VStore.Domain.Entities.RefreshToken", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("Expires")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Token")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("RefreshTokens");
+                });
+
             modelBuilder.Entity("VStore.Domain.Entities.User", b =>
                 {
                     b.Property<Guid>("Id")
@@ -371,9 +395,6 @@ namespace VStore.Persistence.Migrations
 
                     b.Property<string>("FirstName")
                         .HasColumnType("nvarchar(255)");
-
-                    b.Property<string>("ForgetPasswordCode")
-                        .HasColumnType("varchar(6)");
 
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
@@ -393,6 +414,12 @@ namespace VStore.Persistence.Migrations
                     b.Property<string>("Password")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ResetPasswordCode")
+                        .HasColumnType("varchar(6)");
+
+                    b.Property<int>("Role")
+                        .HasColumnType("int");
 
                     b.Property<int>("Sex")
                         .HasColumnType("int");
@@ -499,6 +526,17 @@ namespace VStore.Persistence.Migrations
                     b.Navigation("Category");
                 });
 
+            modelBuilder.Entity("VStore.Domain.Entities.RefreshToken", b =>
+                {
+                    b.HasOne("VStore.Domain.Entities.User", "User")
+                        .WithMany("RefreshTokens")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("VStore.Domain.Entities.Brand", b =>
                 {
                     b.Navigation("Products");
@@ -536,6 +574,8 @@ namespace VStore.Persistence.Migrations
             modelBuilder.Entity("VStore.Domain.Entities.User", b =>
                 {
                     b.Navigation("Customer");
+
+                    b.Navigation("RefreshTokens");
                 });
 #pragma warning restore 612, 618
         }
