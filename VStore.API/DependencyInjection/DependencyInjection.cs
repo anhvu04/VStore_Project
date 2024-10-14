@@ -1,3 +1,4 @@
+using Microsoft.OpenApi.Models;
 using VStore.Application.DependencyInjection.Extensions;
 using VStore.Infrastructure.DependencyInjection.Extensions;
 using VStore.Persistence.DependencyInjection.Extensions;
@@ -11,5 +12,40 @@ public static class DependencyInjection
         services.AddPersistence(configuration);
         services.AddApplication();
         services.AddInfrastructure(configuration);
+        services.AddSwagger();
+    }
+
+    private static void AddSwagger(this IServiceCollection services)
+    {
+        services.AddSwaggerGen(o =>
+        {
+            o.SwaggerDoc(
+                "v1",
+                new OpenApiInfo { Title = "VStore", Version = "v1" }
+            );
+            o.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+            {
+                In = ParameterLocation.Header,
+                Description = "Please enter a valid token",
+                Name = "Authorization",
+                Type = SecuritySchemeType.Http,
+                BearerFormat = "JWT",
+                Scheme = "Bearer"
+            });
+            o.AddSecurityRequirement(new OpenApiSecurityRequirement
+            {
+                {
+                    new OpenApiSecurityScheme
+                    {
+                        Reference = new OpenApiReference
+                        {
+                            Type = ReferenceType.SecurityScheme,
+                            Id = "Bearer"
+                        }
+                    },
+                    Array.Empty<string>()
+                }
+            });
+        });
     }
 }

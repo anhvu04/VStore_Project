@@ -12,7 +12,7 @@ using VStore.Domain.AuthenticationScheme;
 
 namespace VStore.API.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/authentication")]
     [ApiController]
     public class AuthenticationController(ISender sender) : ApiController(sender)
     {
