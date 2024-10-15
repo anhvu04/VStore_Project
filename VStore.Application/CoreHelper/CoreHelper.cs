@@ -8,4 +8,9 @@ public class CoreHelper
     {
         return context.Request.Headers.Authorization.ToString().Split(" ")[1];
     }
+
+    public static Guid GetUserIdFromContext(HttpContext context)
+    {
+        return Guid.Parse(context.User.Claims.First(c => c.Type == "id").Value);
+    }
 }
