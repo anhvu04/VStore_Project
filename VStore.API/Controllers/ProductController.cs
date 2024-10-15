@@ -8,6 +8,7 @@ using VStore.Application.Usecases.Brand.Query.GetBrand;
 using VStore.Application.Usecases.Category.Command.CreateCategory;
 using VStore.Application.Usecases.Category.Command.DeleteCategory;
 using VStore.Application.Usecases.Category.Command.UpdateCategory;
+using VStore.Application.Usecases.Category.Query.GetCategory;
 using VStore.Domain.AuthenticationScheme;
 using VStore.Domain.Enums;
 
@@ -55,6 +56,14 @@ public class ProductController(ISender sender) : ApiController(sender)
     #endregion
 
     #region Categories
+
+    [HttpGet("categories/{id}")]
+    public async Task<IActionResult> GetCategories([FromRoute] int id)
+    {
+        var query = new GetCategoryQuery(id);
+        var res = await Sender.Send(query);
+        return res.IsSuccess ? Ok(res.Value) : BadRequest(res.Error);
+    }
 
     [HttpPost("categories")]
     [Authorize(AuthenticationSchemes = AuthenticationScheme.Access, Roles = nameof(Role.Admin))]
