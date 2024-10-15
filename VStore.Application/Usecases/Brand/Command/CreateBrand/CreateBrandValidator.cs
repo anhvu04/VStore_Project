@@ -1,4 +1,5 @@
 using FluentValidation;
+using VStore.Application.Validators;
 
 namespace VStore.Application.Usecases.Brand.Command.CreateBrand;
 
@@ -6,6 +7,6 @@ public class CreateBrandValidator : AbstractValidator<CreateBrandCommand>
 {
     public CreateBrandValidator()
     {
-        RuleFor(x => x.Name).NotEmpty().NotNull().WithMessage("Name is required");
+        RuleFor(x => x.Name).ValidName();
     }
 }

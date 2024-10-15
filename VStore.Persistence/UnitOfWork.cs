@@ -141,12 +141,25 @@ public class UnitOfWork : IUnitOfWork
 
     private void SoftDeleteEntities()
     {
-        var entries = _dbContext.ChangeTracker.Entries<ISoftDelete>().Where(x =>
+        var context = _contextAccessor.HttpContext;
+        if (context == null)
+        {
+            return;
+        }
+
+        var userId = Guid.Parse(context.User.Claims.FirstOrDefault(c => c.Type == "UserId")?.Value ?? Empty);
+        if (userId == default)
+        {
+            return;
+        }
+
+        var entries = _dbContext.ChangeTracker.Entries<IAuditable>().Where(x =>
             x.State is EntityState.Deleted);
         foreach (var entry in entries)
         {
             entry.Entity.IsDeleted = true;
             entry.State = EntityState.Modified;
+            entry.Entity.ModifiedBy = userId;
             entry.Entity.DeletedDate = DateTime.UtcNow;
         }
     }

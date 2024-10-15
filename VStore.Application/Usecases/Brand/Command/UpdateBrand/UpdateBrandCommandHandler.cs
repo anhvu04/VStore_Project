@@ -30,9 +30,9 @@ public class UpdateBrandCommandHandler : ICommandHandler<UpdateBrandCommand>
 
         if (!string.IsNullOrEmpty(request.Name))
         {
-            var brandName = await _brandRepository.FindSingleAsync(x => x.Name == request.Name && x.Id != request.Id,
+            var isExistBrandName = await _brandRepository.AnyAsync(x => x.Name == request.Name && x.Id != request.Id,
                 cancellationToken);
-            if (brandName != null)
+            if (isExistBrandName)
             {
                 return Result.Failure(DomainError.CommonError.AlreadyExists(nameof(Domain.Entities.Brand.Name)));
             }

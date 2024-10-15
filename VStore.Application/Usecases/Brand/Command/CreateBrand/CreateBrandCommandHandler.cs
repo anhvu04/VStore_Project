@@ -22,8 +22,8 @@ public class CreateBrandCommandHandler : ICommandHandler<CreateBrandCommand>
 
     public async Task<Result> Handle(CreateBrandCommand request, CancellationToken cancellationToken)
     {
-        var brandName = await _brandRepository.FindSingleAsync(x => x.Name == request.Name, cancellationToken);
-        if (brandName != null)
+        var isExistBrandName = await _brandRepository.AnyAsync(x => x.Name == request.Name, cancellationToken);
+        if (isExistBrandName)
         {
             return Result.Failure(DomainError.CommonError.AlreadyExists(nameof(Domain.Entities.Brand.Name)));
         }
