@@ -10,7 +10,9 @@ public class Category : EntityAuditBase<int>
     [Column(TypeName = "nvarchar(255)")]
     public string Name { get; set; } = null!;
 
+    [ForeignKey(nameof(Parent))] public int? ParentId { get; set; }
     [Column(TypeName = "nvarchar(max)")] public string? Description { get; set; }
     public bool IsActive { get; set; } = true;
+    public virtual Category? Parent { get; set; }
     public virtual ICollection<Product> Products { get; set; } = [];
 }
