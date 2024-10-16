@@ -54,7 +54,7 @@ public class UpdateCategoryCommandHandler : ICommandHandler<UpdateCategoryComman
 
             category.ParentId = request.ParentId;
         }
-
+        
         category.Description = request.Description ?? category.Description;
         category.IsActive = request.IsActive ?? category.IsActive;
         _categoryRepository.Update(category);
