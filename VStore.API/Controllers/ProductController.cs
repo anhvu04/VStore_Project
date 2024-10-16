@@ -5,9 +5,11 @@ using VStore.Application.Usecases.Brand.Command.CreateBrand;
 using VStore.Application.Usecases.Brand.Command.DeleteBrand;
 using VStore.Application.Usecases.Brand.Command.UpdateBrand;
 using VStore.Application.Usecases.Brand.Query.GetBrand;
+using VStore.Application.Usecases.Brand.Query.GetBrands;
 using VStore.Application.Usecases.Category.Command.CreateCategory;
 using VStore.Application.Usecases.Category.Command.DeleteCategory;
 using VStore.Application.Usecases.Category.Command.UpdateCategory;
+using VStore.Application.Usecases.Category.Query.GetCategories;
 using VStore.Application.Usecases.Category.Query.GetCategory;
 using VStore.Domain.AuthenticationScheme;
 using VStore.Domain.Enums;
@@ -18,6 +20,13 @@ namespace VStore.API.Controllers;
 public class ProductController(ISender sender) : ApiController(sender)
 {
     #region Brands
+
+    [HttpGet("brands")]
+    public async Task<IActionResult> GetBrands([FromQuery] GetBrandsQuery query)
+    {
+        var res = await Sender.Send(query);
+        return res.IsSuccess ? Ok(res.Value) : BadRequest(res.Error);
+    }
 
     [HttpGet("brands/{id}")]
     public async Task<IActionResult> GetById([FromRoute] int id)
@@ -56,6 +65,13 @@ public class ProductController(ISender sender) : ApiController(sender)
     #endregion
 
     #region Categories
+
+    [HttpGet("categories")]
+    public async Task<IActionResult> GetCategories([FromQuery] GetCategoriesQuery query)
+    {
+        var res = await Sender.Send(query);
+        return res.IsSuccess ? Ok(res.Value) : BadRequest(res.Error);
+    }
 
     [HttpGet("categories/{id}")]
     public async Task<IActionResult> GetCategories([FromRoute] int id)
