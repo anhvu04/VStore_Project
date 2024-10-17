@@ -1,3 +1,4 @@
+using AutoMapper;
 using VStore.Application.Abstractions.Authentication;
 using VStore.Application.Abstractions.BCrypt;
 using VStore.Application.Abstractions.MediatR;
@@ -18,15 +19,18 @@ public class LoginCommandHandler : ICommandHandler<LoginCommand, LoginResponseMo
     private readonly IRefreshTokenRepository _refreshTokenRepository;
     private readonly IUnitOfWork _unitOfWork;
     private readonly IPasswordHasher _passwordHasher;
+    private readonly IMapper _mapper;
 
     public LoginCommandHandler(IJwtTokenGenerator jwtTokenGenerator, IUserRepository userRepository,
-        IRefreshTokenRepository refreshTokenRepository, IUnitOfWork unitOfWork, IPasswordHasher passwordHasher)
+        IRefreshTokenRepository refreshTokenRepository, IUnitOfWork unitOfWork, IPasswordHasher passwordHasher,
+        IMapper mapper)
     {
         _jwtTokenGenerator = jwtTokenGenerator;
         _userRepository = userRepository;
         _refreshTokenRepository = refreshTokenRepository;
         _unitOfWork = unitOfWork;
         _passwordHasher = passwordHasher;
+        _mapper = mapper;
     }
 
     public async Task<Result<LoginResponseModel>> Handle(LoginCommand request, CancellationToken cancellationToken)
@@ -35,6 +39,11 @@ public class LoginCommandHandler : ICommandHandler<LoginCommand, LoginResponseMo
         if (user == null)
         {
             return Result<LoginResponseModel>.Failure(DomainError.Authentication.IncorrectUsernameOrPassword);
+        }
+
+        if (user.IsBanned)
+        {
+            return Result<LoginResponseModel>.Failure(DomainError.User.Banned);
         }
 
         var password = _passwordHasher.VerifyPassword(request.Password, user.Password);
@@ -57,15 +66,9 @@ public class LoginCommandHandler : ICommandHandler<LoginCommand, LoginResponseMo
         _refreshTokenRepository.Add(nRefreshToken);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-        var response = new LoginResponseModel
-        {
-            UserId = user.Id,
-            FirstName = user.FirstName ?? "",
-            LastName = user.LastName ?? "",
-            Role = user.Role.ToString(),
-            AccessToken = token,
-            RefreshToken = refreshToken
-        };
+        var response = _mapper.Map<LoginResponseModel>(user);
+        response.AccessToken = token;
+        response.RefreshToken = refreshToken;
         return Result<LoginResponseModel>.Success(response);
     }
 }
