@@ -13,6 +13,8 @@ public static class ServiceCollectionExtensions
     {
         services.AddSqlServerPersistence(configuration);
         services.AddDependencies();
+        // Add HttpContextAccessor
+        services.AddHttpContextAccessor();
     }
 
     private static void AddSqlServerPersistence(this IServiceCollection services, IConfiguration configuration)
@@ -31,6 +33,8 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IUserRepository, UserRepository>();
         services.AddScoped<ICustomerRepository, CustomerRepository>();
         services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
+        services.AddScoped<IBrandRepository, BrandRepository>();
+        services.AddScoped<ICategoryRepository, CategoryRepository>();
         services.AddScoped<IUnitOfWork, UnitOfWork>();
     }
 }

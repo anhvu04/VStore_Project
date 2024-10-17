@@ -1,3 +1,4 @@
+using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using VStore.Application.Abstractions.Authentication;
 using VStore.Application.Abstractions.BCrypt;
@@ -20,10 +21,11 @@ public class RegisterCommandHandler : ICommandHandler<RegisterCommand>
     private readonly IJwtTokenGenerator _jwtTokenGenerator;
     private readonly IPasswordHasher _passwordHasher;
     private readonly IEmailService _emailService;
+    private readonly IMapper _mapper;
 
     public RegisterCommandHandler(IUserRepository userRepository, IUnitOfWork unitOfWork,
         ICustomerRepository customerRepository, IJwtTokenGenerator jwtTokenGenerator, IPasswordHasher passwordHasher,
-        IEmailService emailService)
+        IEmailService emailService, IMapper mapper)
     {
         _userRepository = userRepository;
         _unitOfWork = unitOfWork;
@@ -31,6 +33,7 @@ public class RegisterCommandHandler : ICommandHandler<RegisterCommand>
         _jwtTokenGenerator = jwtTokenGenerator;
         _passwordHasher = passwordHasher;
         _emailService = emailService;
+        _mapper = mapper;
     }
 
     public async Task<Result> Handle(RegisterCommand request, CancellationToken cancellationToken)
@@ -64,28 +67,14 @@ public class RegisterCommandHandler : ICommandHandler<RegisterCommand>
         var hashedPassword = _passwordHasher.HashPassword(request.Password);
 
         // create user
-        var userEntity = new User
-        {
-            Id = Guid.NewGuid(),
-            UserName = request.Username,
-            Password = hashedPassword,
-            FirstName = request.FirstName,
-            LastName = request.LastName,
-            VerificationCode = verificationCode,
-            Sex = (Sex)request.Sex,
-            Role = Role.Customer,
-            IsActive = false
-        };
+        var userEntity = _mapper.Map<Domain.Entities.User>(request);
+        userEntity.Password = hashedPassword;
+        userEntity.VerificationCode = verificationCode;
         _userRepository.Add(userEntity);
 
         // create customer
-        var customer = new Customer
-        {
-            UserId = userEntity.Id,
-            Email = request.Email,
-            PhoneNumber = request.PhoneNumber,
-            DateOfBirth = DateOnly.FromDateTime(request.DateOfBirth),
-        };
+        var customer = _mapper.Map<Customer>(request);
+        customer.UserId = userEntity.Id;
         _customerRepository.Add(customer);
         await _unitOfWork.SaveChangesAsync(false, true, cancellationToken);
 

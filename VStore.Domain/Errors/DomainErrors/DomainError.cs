@@ -35,5 +35,18 @@ public static class DomainError
 
         public static readonly Error NotActive =
             new("Error.User.NotActive", "User is not active.");
+
+        public static readonly Error WrongPassword =
+            new("Error.User.WrongPassword", "Wrong password.");
+    }
+
+    public static class Category
+    {
+        public static readonly Error HasSubCategory =
+            new("Error.Category.HasSubCategory", "Category has sub category.");
+
+        public static readonly Error InvalidParentCategory =
+            new("Error.Category.InvalidParentCategory",
+                "This parent category is a child category of the current category.");
     }
 }

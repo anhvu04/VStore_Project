@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using VStore.Domain.Abstractions;
 using VStore.Domain.Abstractions.Entities;
 using VStore.Domain.Exceptions;
+using static System.String;
 
 namespace VStore.Persistence;
 
@@ -12,9 +13,10 @@ public class UnitOfWork : IUnitOfWork
     private readonly ApplicationDbContext _dbContext;
     private readonly IHttpContextAccessor _contextAccessor;
 
-    public UnitOfWork(ApplicationDbContext dbContext)
+    public UnitOfWork(ApplicationDbContext dbContext, IHttpContextAccessor contextAccessor)
     {
         _dbContext = dbContext;
+        _contextAccessor = contextAccessor;
     }
 
     public async ValueTask DisposeAsync()
@@ -91,7 +93,7 @@ public class UnitOfWork : IUnitOfWork
             return;
         }
 
-        var userId = context.Items["UserId"] as Guid? ?? default;
+        var userId = Guid.Parse(context.User.Claims.FirstOrDefault(c => c.Type == "UserId")?.Value ?? Empty);
         if (userId == default)
         {
             return;
@@ -139,12 +141,25 @@ public class UnitOfWork : IUnitOfWork
 
     private void SoftDeleteEntities()
     {
-        var entries = _dbContext.ChangeTracker.Entries<ISoftDelete>().Where(x =>
+        var context = _contextAccessor.HttpContext;
+        if (context == null)
+        {
+            return;
+        }
+
+        var userId = Guid.Parse(context.User.Claims.FirstOrDefault(c => c.Type == "UserId")?.Value ?? Empty);
+        if (userId == default)
+        {
+            return;
+        }
+
+        var entries = _dbContext.ChangeTracker.Entries<IAuditable>().Where(x =>
             x.State is EntityState.Deleted);
         foreach (var entry in entries)
         {
             entry.Entity.IsDeleted = true;
             entry.State = EntityState.Modified;
+            entry.Entity.ModifiedBy = userId;
             entry.Entity.DeletedDate = DateTime.UtcNow;
         }
     }
