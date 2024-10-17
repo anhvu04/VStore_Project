@@ -30,7 +30,7 @@ public class DeleteCategoryCommandHandler : ICommandHandler<DeleteCategoryComman
             .FirstOrDefaultAsync(cancellationToken: cancellationToken);
         if (subCategory != null)
         {
-            return Result.Failure(DomainError.Category.HasSubCategory());
+            return Result.Failure(DomainError.Category.HasSubCategory);
         }
 
         category.IsActive = false;

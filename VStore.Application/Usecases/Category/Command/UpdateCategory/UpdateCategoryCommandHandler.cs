@@ -49,7 +49,7 @@ public class UpdateCategoryCommandHandler : ICommandHandler<UpdateCategoryComman
 
             if (_categoryRepository.IsAncestorOf(request.Id, request.ParentId, categoryList))
             {
-                return Result.Failure(DomainError.Category.InvalidParentCategory());
+                return Result.Failure(DomainError.Category.InvalidParentCategory);
             }
 
             category.ParentId = request.ParentId;

@@ -7,6 +7,6 @@ public class CreateBrandValidator : AbstractValidator<CreateBrandCommand>
 {
     public CreateBrandValidator()
     {
-        RuleFor(x => x.Name).ValidName();
+        RuleFor(x => x.Name).NotNullEmpty();
     }
 }

@@ -1,4 +1,5 @@
 using Microsoft.OpenApi.Models;
+using VStore.API.Common;
 using VStore.Application.DependencyInjection.Extensions;
 using VStore.Infrastructure.DependencyInjection.Extensions;
 using VStore.Persistence.DependencyInjection.Extensions;
@@ -13,6 +14,7 @@ public static class DependencyInjection
         services.AddApplication();
         services.AddInfrastructure(configuration);
         services.AddSwagger();
+        services.AddFilter();
     }
 
     private static void AddSwagger(this IServiceCollection services)
@@ -47,5 +49,10 @@ public static class DependencyInjection
                 }
             });
         });
+    }
+
+    private static void AddFilter(this IServiceCollection services)
+    {
+        services.AddScoped<UserExistFilter>();
     }
 }
