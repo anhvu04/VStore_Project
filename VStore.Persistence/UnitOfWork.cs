@@ -93,7 +93,8 @@ public class UnitOfWork : IUnitOfWork
             return;
         }
 
-        var userId = Guid.Parse(context.User.Claims.FirstOrDefault(c => c.Type == "UserId")?.Value ?? Empty);
+        var userId = Guid.Parse(context.User.Claims.FirstOrDefault(c => c.Type == "UserId")?.Value ??
+                                Guid.Empty.ToString());
         if (userId == default)
         {
             return;
@@ -147,7 +148,8 @@ public class UnitOfWork : IUnitOfWork
             return;
         }
 
-        var userId = Guid.Parse(context.User.Claims.FirstOrDefault(c => c.Type == "UserId")?.Value ?? Empty);
+        var userId = Guid.Parse(context.User.Claims.FirstOrDefault(c => c.Type == "UserId")?.Value ??
+                                Guid.Empty.ToString());
         if (userId == default)
         {
             return;

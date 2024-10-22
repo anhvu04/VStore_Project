@@ -40,6 +40,12 @@ public static class DomainError
             new("Error.User.WrongPassword", "Wrong password.");
     }
 
+    public static class Brand
+    {
+        public static readonly Error HasProduct =
+            new("Error.Brand.HasProduct", "Brand has product.");
+    }
+
     public static class Category
     {
         public static readonly Error HasSubCategory =
@@ -48,5 +54,14 @@ public static class DomainError
         public static readonly Error InvalidParentCategory =
             new("Error.Category.InvalidParentCategory",
                 "This parent category is a child category of the current category.");
+
+        public static readonly Error HasProduct =
+            new("Error.Category.HasProduct", "Category has product.");
+    }
+
+    public static class Product
+    {
+        public static readonly Error InvalidPrice =
+            new("Error.Product.InvalidPrice", "Sale price must be less than the original price.");
     }
 }
