@@ -11,6 +11,9 @@ using VStore.Application.Usecases.Category.Command.DeleteCategory;
 using VStore.Application.Usecases.Category.Command.UpdateCategory;
 using VStore.Application.Usecases.Category.Query.GetCategories;
 using VStore.Application.Usecases.Category.Query.GetCategory;
+using VStore.Application.Usecases.Product.Command.CreateProduct;
+using VStore.Application.Usecases.Product.Command.DeleteProduct;
+using VStore.Application.Usecases.Product.Command.UpdateProduct;
 using VStore.Domain.AuthenticationScheme;
 using VStore.Domain.Enums;
 
@@ -103,6 +106,36 @@ public class ProductController(ISender sender) : ApiController(sender)
     public async Task<IActionResult> DeleteCategory([FromRoute] int id)
     {
         var command = new DeleteCategoryCommand(id);
+        var res = await Sender.Send(command);
+        return res.IsSuccess ? Ok() : BadRequest(res.Error);
+    }
+
+    #endregion
+
+    #region Products
+
+    [HttpPost]
+    [Authorize(AuthenticationSchemes = AuthenticationScheme.Access, Roles = nameof(Role.Admin))]
+    public async Task<IActionResult> CreateProduct([FromBody] CreateProductCommand command)
+    {
+        var res = await Sender.Send(command);
+        return res.IsSuccess ? Ok() : BadRequest(res.Error);
+    }
+
+    [HttpPatch("{id}")]
+    [Authorize(AuthenticationSchemes = AuthenticationScheme.Access, Roles = nameof(Role.Admin))]
+    public async Task<IActionResult> UpdateProduct([FromRoute] Guid id, [FromBody] UpdateProductCommand command)
+    {
+        command = command with { Id = id };
+        var res = await Sender.Send(command);
+        return res.IsSuccess ? Ok() : BadRequest(res.Error);
+    }
+
+    [HttpDelete("{id}")]
+    [Authorize(AuthenticationSchemes = AuthenticationScheme.Access, Roles = nameof(Role.Admin))]
+    public async Task<IActionResult> DeleteProduct([FromRoute] Guid id)
+    {
+        var command = new DeleteProductCommand(id);
         var res = await Sender.Send(command);
         return res.IsSuccess ? Ok() : BadRequest(res.Error);
     }
