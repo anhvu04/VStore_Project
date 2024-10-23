@@ -14,6 +14,8 @@ using VStore.Application.Usecases.Category.Query.GetCategory;
 using VStore.Application.Usecases.Product.Command.CreateProduct;
 using VStore.Application.Usecases.Product.Command.DeleteProduct;
 using VStore.Application.Usecases.Product.Command.UpdateProduct;
+using VStore.Application.Usecases.Product.Query.GetProduct;
+using VStore.Application.Usecases.Product.Query.GetProducts;
 using VStore.Domain.AuthenticationScheme;
 using VStore.Domain.Enums;
 
@@ -22,6 +24,51 @@ namespace VStore.API.Controllers;
 [Route("api/product")]
 public class ProductController(ISender sender) : ApiController(sender)
 {
+    #region Products
+
+    [HttpGet]
+    public async Task<IActionResult> GetProducts([FromQuery] GetProductsQuery query)
+    {
+        var res = await Sender.Send(query);
+        return res.IsSuccess ? Ok(res.Value) : BadRequest(res.Error);
+    }
+
+    [HttpGet("{id}")]
+    public async Task<IActionResult> GetProduct([FromRoute] Guid id)
+    {
+        var query = new GetProductQuery(id);
+        var res = await Sender.Send(query);
+        return res.IsSuccess ? Ok(res.Value) : BadRequest(res.Error);
+    }
+
+    [HttpPost]
+    [Authorize(AuthenticationSchemes = AuthenticationScheme.Access, Roles = nameof(Role.Admin))]
+    public async Task<IActionResult> CreateProduct([FromBody] CreateProductCommand command)
+    {
+        var res = await Sender.Send(command);
+        return res.IsSuccess ? Ok() : BadRequest(res.Error);
+    }
+
+    [HttpPatch("{id}")]
+    [Authorize(AuthenticationSchemes = AuthenticationScheme.Access, Roles = nameof(Role.Admin))]
+    public async Task<IActionResult> UpdateProduct([FromRoute] Guid id, [FromBody] UpdateProductCommand command)
+    {
+        command = command with { Id = id };
+        var res = await Sender.Send(command);
+        return res.IsSuccess ? Ok() : BadRequest(res.Error);
+    }
+
+    [HttpDelete("{id}")]
+    [Authorize(AuthenticationSchemes = AuthenticationScheme.Access, Roles = nameof(Role.Admin))]
+    public async Task<IActionResult> DeleteProduct([FromRoute] Guid id)
+    {
+        var command = new DeleteProductCommand(id);
+        var res = await Sender.Send(command);
+        return res.IsSuccess ? Ok() : BadRequest(res.Error);
+    }
+
+    #endregion
+
     #region Brands
 
     [HttpGet("brands")]
@@ -32,7 +79,7 @@ public class ProductController(ISender sender) : ApiController(sender)
     }
 
     [HttpGet("brands/{id}")]
-    public async Task<IActionResult> GetById([FromRoute] int id)
+    public async Task<IActionResult> GetBrand([FromRoute] int id)
     {
         var query = new GetBrandQuery(id);
         var res = await Sender.Send(query);
@@ -77,7 +124,7 @@ public class ProductController(ISender sender) : ApiController(sender)
     }
 
     [HttpGet("categories/{id}")]
-    public async Task<IActionResult> GetCategories([FromRoute] int id)
+    public async Task<IActionResult> GetCategory([FromRoute] int id)
     {
         var query = new GetCategoryQuery(id);
         var res = await Sender.Send(query);
@@ -106,36 +153,6 @@ public class ProductController(ISender sender) : ApiController(sender)
     public async Task<IActionResult> DeleteCategory([FromRoute] int id)
     {
         var command = new DeleteCategoryCommand(id);
-        var res = await Sender.Send(command);
-        return res.IsSuccess ? Ok() : BadRequest(res.Error);
-    }
-
-    #endregion
-
-    #region Products
-
-    [HttpPost]
-    [Authorize(AuthenticationSchemes = AuthenticationScheme.Access, Roles = nameof(Role.Admin))]
-    public async Task<IActionResult> CreateProduct([FromBody] CreateProductCommand command)
-    {
-        var res = await Sender.Send(command);
-        return res.IsSuccess ? Ok() : BadRequest(res.Error);
-    }
-
-    [HttpPatch("{id}")]
-    [Authorize(AuthenticationSchemes = AuthenticationScheme.Access, Roles = nameof(Role.Admin))]
-    public async Task<IActionResult> UpdateProduct([FromRoute] Guid id, [FromBody] UpdateProductCommand command)
-    {
-        command = command with { Id = id };
-        var res = await Sender.Send(command);
-        return res.IsSuccess ? Ok() : BadRequest(res.Error);
-    }
-
-    [HttpDelete("{id}")]
-    [Authorize(AuthenticationSchemes = AuthenticationScheme.Access, Roles = nameof(Role.Admin))]
-    public async Task<IActionResult> DeleteProduct([FromRoute] Guid id)
-    {
-        var command = new DeleteProductCommand(id);
         var res = await Sender.Send(command);
         return res.IsSuccess ? Ok() : BadRequest(res.Error);
     }

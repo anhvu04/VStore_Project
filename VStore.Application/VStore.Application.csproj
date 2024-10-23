@@ -9,7 +9,6 @@
     <ItemGroup>
       <Folder Include="DependencyInjection\Options\" />
       <Folder Include="Exceptions\" />
-      <Folder Include="Usecases\Product\Query\" />
       <Folder Include="Usecases\User\Common\" />
       <Folder Include="Usecases\User\Query\" />
     </ItemGroup>
