@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using VStore.Domain.Entities;
+using VStore.Persistence.Configurations;
 
 namespace VStore.Persistence;
 
@@ -12,6 +13,7 @@ public class ApplicationDbContext : DbContext
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(ApplicationDbContext).Assembly);
+        modelBuilder.ApplySoftDeleteFilter();
     }
 
     public virtual DbSet<Brand> Brands { get; set; }

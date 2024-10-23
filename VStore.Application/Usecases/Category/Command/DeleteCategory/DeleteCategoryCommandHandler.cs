@@ -26,6 +26,12 @@ public class DeleteCategoryCommandHandler : ICommandHandler<DeleteCategoryComman
             return Result.Failure(DomainError.CommonError.NotFound(nameof(Domain.Entities.Category)));
         }
 
+        var isExistProduct = await _categoryRepository.IsCategoryHasProductAsync(category.Id, cancellationToken);
+        if (isExistProduct)
+        {
+            return Result.Failure(DomainError.Category.HasProduct);
+        }
+
         var subCategory = await _categoryRepository.FindAll(x => x.ParentId == category.Id)
             .FirstOrDefaultAsync(cancellationToken: cancellationToken);
         if (subCategory != null)
