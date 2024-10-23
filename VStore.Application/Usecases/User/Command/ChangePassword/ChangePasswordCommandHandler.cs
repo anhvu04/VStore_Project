@@ -29,11 +29,6 @@ public class ChangePasswordCommandHandler : ICommandHandler<ChangePasswordComman
             return Result.Failure(DomainError.CommonError.NotFound(nameof(Domain.Entities.User)));
         }
 
-        if (user.IsBanned)
-        {
-            return Result.Failure(DomainError.User.Banned);
-        }
-
         var hashedPassword = _passwordHasher.VerifyPassword(request.OldPassword, user.Password);
         if (!hashedPassword)
         {
