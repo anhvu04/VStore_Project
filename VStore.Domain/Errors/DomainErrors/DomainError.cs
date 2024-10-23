@@ -63,5 +63,12 @@ public static class DomainError
     {
         public static readonly Error InvalidPrice =
             new("Error.Product.InvalidPrice", "Sale price must be less than the original price.");
+
+        public static readonly Error NotEnoughQuantity =
+            new("Error.Product.NotEnoughQuantity", "Not enough quantity.");
+
+        public static Error ExceedQuantity(int quantity, int productQuantity) =>
+            new("Error.Product.NotEnoughQuantity", $"You have already had {quantity} products in your cart. " +
+                                                   $"The remaining quantity is {productQuantity - quantity}.");
     }
 }

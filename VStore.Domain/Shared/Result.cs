@@ -5,7 +5,7 @@ public class Result
     public bool IsSuccess { get; }
     public Error? Error { get; }
 
-    protected Result(bool isSuccess, Error? error)
+    public Result(bool isSuccess, Error? error)
     {
         if (isSuccess && error != null)
         {
