@@ -1,5 +1,5 @@
-using AutoMapper;
 using Microsoft.EntityFrameworkCore;
+using VStore.Application.Abstractions.CartService;
 using VStore.Application.Abstractions.MediatR;
 using VStore.Application.CoreHelper;
 using VStore.Application.Usecases.Cart.Common;
@@ -13,26 +13,23 @@ namespace VStore.Application.Usecases.Cart.Query.GetCartQuery;
 
 public class GetCartQueryHandler : IQueryHandler<GetCartQuery, CartModel>
 {
-    private readonly ICartDetailRepository _cartDetailRepository;
     private readonly ICartRepository _cartRepository;
-    private readonly IMapper _mapper;
     private readonly IUnitOfWork _unitOfWork;
-    private readonly IProductRepository _productRepository;
+    private readonly ICartService _cartService;
 
-    public GetCartQueryHandler(ICartDetailRepository cartDetailRepository, ICartRepository cartRepository,
-        IMapper mapper, IUnitOfWork unitOfWork, IProductRepository productRepository)
+    public GetCartQueryHandler(ICartRepository cartRepository, IUnitOfWork unitOfWork, ICartService cartService)
     {
-        _cartDetailRepository = cartDetailRepository;
         _cartRepository = cartRepository;
-        _mapper = mapper;
         _unitOfWork = unitOfWork;
-        _productRepository = productRepository;
+        _cartService = cartService;
     }
 
     #region ChatGPT suggestion
 
     public async Task<Result<CartModel>> Handle(GetCartQuery request, CancellationToken cancellationToken)
     {
+        // check any product is deleted in the cart (because of soft delete products)
+        var flag = await _cartService.RefreshCartAsync(request.UserId, cancellationToken);
         var cart = await _cartRepository.FindAll(x => x.CustomerId == request.UserId)
             .Select(cart => new
             {
@@ -83,6 +80,10 @@ public class GetCartQueryHandler : IQueryHandler<GetCartQuery, CartModel>
             TotalItems = cart.CartDetails.Count,
             TotalAmount = cart.TotalAmount
         };
+        if (flag)
+        {
+            await _unitOfWork.SaveChangesAsync(cancellationToken);
+        }
 
         return Result<CartModel>.Success(cartModelResult);
     }

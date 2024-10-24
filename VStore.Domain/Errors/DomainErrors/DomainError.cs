@@ -71,4 +71,18 @@ public static class DomainError
             new("Error.Product.NotEnoughQuantity", $"You have already had {quantity} products in your cart. " +
                                                    $"The remaining quantity is {productQuantity - quantity}.");
     }
+
+    public static class Cart
+    {
+        public static readonly Error EmptyProductIds =
+            new("Error.Cart.EmptyProductIds", "ProductIds is empty.");
+
+        public static Error ProductNotExistInCart(List<Guid> invalidProduct)
+        {
+            var message = invalidProduct.Count == 1
+                ? $"Product {invalidProduct.First()} does not exist in cart."
+                : $"Products {string.Join(", ", invalidProduct)} do not exist in cart.";
+            return new("Error.Cart.ProductNotExistInCart", message);
+        }
+    }
 }

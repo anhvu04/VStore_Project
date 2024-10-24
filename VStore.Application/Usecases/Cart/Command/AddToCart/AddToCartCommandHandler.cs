@@ -31,7 +31,8 @@ public class AddToCartCommandHandler : ICommandHandler<AddToCartCommand>
 
     public async Task<Result> Handle(AddToCartCommand request, CancellationToken cancellationToken)
     {
-        var product = await _productRepository.FindByIdAsync(request.ProductId, cancellationToken);
+        var product =
+            await _productRepository.FindByIdAsync(request.ProductId, cancellationToken, x => x.Brand, x => x.Category);
         if (product == null)
         {
             return Result.Failure(DomainError.CommonError.NotFound(nameof(Domain.Entities.Product)));
@@ -51,7 +52,7 @@ public class AddToCartCommandHandler : ICommandHandler<AddToCartCommand>
         }
 
         var cartDetail = cart.CartDetails.FirstOrDefault(
-            x => x.CartId == cart.Id && x.ProductId == product.Id);
+            x => x.CartId == cart.Id && x.ProductId == request.ProductId);
 
         if (cartDetail == null)
         {
