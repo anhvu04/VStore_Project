@@ -63,5 +63,26 @@ public static class DomainError
     {
         public static readonly Error InvalidPrice =
             new("Error.Product.InvalidPrice", "Sale price must be less than the original price.");
+
+        public static readonly Error NotEnoughQuantity =
+            new("Error.Product.NotEnoughQuantity", "Not enough quantity.");
+
+        public static Error ExceedQuantity(int quantity, int productQuantity) =>
+            new("Error.Product.NotEnoughQuantity", $"You have already had {quantity} products in your cart. " +
+                                                   $"The remaining quantity is {productQuantity - quantity}.");
+    }
+
+    public static class Cart
+    {
+        public static readonly Error EmptyProductIds =
+            new("Error.Cart.EmptyProductIds", "ProductIds is empty.");
+
+        public static Error ProductNotExistInCart(List<Guid> invalidProduct)
+        {
+            var message = invalidProduct.Count == 1
+                ? $"Product {invalidProduct.First()} does not exist in cart."
+                : $"Products {string.Join(", ", invalidProduct)} do not exist in cart.";
+            return new("Error.Cart.ProductNotExistInCart", message);
+        }
     }
 }
