@@ -9,7 +9,7 @@ public class PageList<T>
     public int PageSize { get; set; }
     public int TotalCount { get; set; }
 
-    private PageList(List<T> items, int count, int page, int pageSize)
+    public PageList(List<T> items, int count, int page, int pageSize)
     {
         Items = items;
         TotalCount = count;
@@ -26,6 +26,15 @@ public class PageList<T>
         var totalCount = await queryable.CountAsync();
         var items = await queryable.Skip((page - 1) * pageSize)
             .Take(pageSize).ToListAsync();
+        return new PageList<T>(items, totalCount, page, pageSize);
+    }
+
+    public static PageList<T> CreateWithoutAsync(IQueryable<T> queryable,
+        int page, int pageSize)
+    {
+        var totalCount = queryable.Count();
+        var items = queryable.Skip((page - 1) * pageSize)
+            .Take(pageSize).ToList();
         return new PageList<T>(items, totalCount, page, pageSize);
     }
 }

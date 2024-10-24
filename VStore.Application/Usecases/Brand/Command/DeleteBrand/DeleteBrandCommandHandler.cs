@@ -25,6 +25,12 @@ public class DeleteBrandCommandHandler : ICommandHandler<DeleteBrandCommand>
             return Result.Failure(DomainError.CommonError.NotFound(nameof(Domain.Entities.Brand)));
         }
 
+        var isExistProduct = await _brandRepository.IsBrandHasProductAsync(brand.Id, cancellationToken);
+        if (isExistProduct)
+        {
+            return Result.Failure(DomainError.Brand.HasProduct);
+        }
+
         brand.IsActive = false;
         _brandRepository.Remove(brand);
         await _unitOfWork.SaveChangesAsync(true, cancellationToken);
