@@ -2,6 +2,7 @@ namespace VStore.Application.Usecases.Cart.Common;
 
 public record CartModel
 {
-    public Guid ProductId { get; init; }
-    public int Quantity { get; init; }
+    public object CartDetails { get; set; } = null!;
+    public int TotalItems { get; set; }
+    public int TotalAmount { get; set; }
 }
