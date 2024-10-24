@@ -4,4 +4,8 @@ using VStore.Application.Usecases.Cart.Common;
 
 namespace VStore.Application.Usecases.Cart.Command.AddToCart;
 
-public record AddToCartCommand([property: JsonIgnore] Guid UserId) : CartModel, ICommand;
+public record AddToCartCommand([property: JsonIgnore] Guid UserId) : ICommand
+{
+    public Guid ProductId { get; init; }
+    public int Quantity { get; init; }
+}

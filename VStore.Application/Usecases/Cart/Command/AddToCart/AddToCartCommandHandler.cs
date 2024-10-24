@@ -1,4 +1,6 @@
+using System.Collections;
 using VStore.Application.Abstractions.MediatR;
+using VStore.Application.Usecases.Cart.Common;
 using VStore.Domain.Abstractions;
 using VStore.Domain.Abstractions.Repositories;
 using VStore.Domain.Entities;
@@ -56,7 +58,7 @@ public class AddToCartCommandHandler : ICommandHandler<AddToCartCommand>
             _cartDetailRepository.Add(new CartDetail
             {
                 CartId = cart.Id,
-                ProductId = product.Id,
+                ProductId = request.ProductId,
                 Quantity = request.Quantity
             });
         }
