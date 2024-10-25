@@ -1,11 +1,11 @@
 using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 using VStore.Application.Abstractions.Authentication;
 using VStore.Application.Abstractions.BCrypt;
 using VStore.Application.Abstractions.MediatR;
 using VStore.Application.Usecases.Authentication.Common;
 using VStore.Domain.Abstractions;
 using VStore.Domain.Abstractions.Repositories;
-using VStore.Domain.Entities;
 using VStore.Domain.Enums;
 using VStore.Domain.Errors.DomainErrors;
 using VStore.Domain.Shared;
@@ -35,47 +35,41 @@ public class LoginCommandHandler : ICommandHandler<LoginCommand, LoginResponseMo
 
     public async Task<Result<LoginResponseModel>> Handle(LoginCommand request, CancellationToken cancellationToken)
     {
-        try
+        var user = await _userRepository.FindAll(x => x.UserName == request.Username)
+            .FirstOrDefaultAsync(cancellationToken);
+        if (user == null)
         {
-            var user = await _userRepository.FindSingleAsync(x => x.UserName == request.Username, cancellationToken);
-            if (user == null)
-            {
-                return Result<LoginResponseModel>.Failure(DomainError.Authentication.IncorrectUsernameOrPassword);
-            }
-
-            if (user.IsBanned)
-            {
-                return Result<LoginResponseModel>.Failure(DomainError.User.Banned);
-            }
-
-            var password = _passwordHasher.VerifyPassword(request.Password, user.Password);
-            if (!password)
-            {
-                return Result<LoginResponseModel>.Failure(DomainError.Authentication.IncorrectUsernameOrPassword);
-            }
-
-            var token = await _jwtTokenGenerator.GenerateToken(user, TokenType.Access);
-            var refreshToken = await _jwtTokenGenerator.GenerateToken(user, TokenType.Refresh);
-            var exp = await _jwtTokenGenerator.GetExpirationDate(refreshToken);
-
-            // add refresh token to db
-            var nRefreshToken = new Domain.Entities.RefreshToken
-            {
-                Token = refreshToken,
-                Expires = exp,
-                UserId = user.Id
-            };
-            _refreshTokenRepository.Add(nRefreshToken);
-            await _unitOfWork.SaveChangesAsync(cancellationToken);
-
-            var response = _mapper.Map<LoginResponseModel>(user);
-            response.AccessToken = token;
-            response.RefreshToken = refreshToken;
-            return Result<LoginResponseModel>.Success(response);
+            return Result<LoginResponseModel>.Failure(DomainError.Authentication.IncorrectUsernameOrPassword);
         }
-        catch (Exception e)
+
+        if (user.IsBanned)
         {
-            return Result<LoginResponseModel>.Failure(DomainError.CommonError.ExceptionHandled(e.Message));
+            return Result<LoginResponseModel>.Failure(DomainError.User.Banned);
         }
+
+        var password = _passwordHasher.VerifyPassword(request.Password, user.Password);
+        if (!password)
+        {
+            return Result<LoginResponseModel>.Failure(DomainError.Authentication.IncorrectUsernameOrPassword);
+        }
+
+        var token = await _jwtTokenGenerator.GenerateToken(user, TokenType.Access);
+        var refreshToken = await _jwtTokenGenerator.GenerateToken(user, TokenType.Refresh);
+        var exp = await _jwtTokenGenerator.GetExpirationDate(refreshToken);
+
+        // add refresh token to db
+        var nRefreshToken = new Domain.Entities.RefreshToken
+        {
+            Token = refreshToken,
+            Expires = exp,
+            UserId = user.Id
+        };
+        _refreshTokenRepository.Add(nRefreshToken);
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+        var response = _mapper.Map<LoginResponseModel>(user);
+        response.AccessToken = token;
+        response.RefreshToken = refreshToken;
+        return Result<LoginResponseModel>.Success(response);
     }
 }

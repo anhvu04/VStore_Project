@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore;
 using VStore.Application.Abstractions.Authentication;
 using VStore.Application.Abstractions.EmailService;
 using VStore.Application.Abstractions.MediatR;
@@ -30,32 +31,25 @@ public class ForgotPasswordCommandHandler : ICommandHandler<ForgotPasswordComman
 
     public async Task<Result> Handle(ForgotPasswordCommand request, CancellationToken cancellationToken)
     {
-        try
+        var customer =
+            await _customerRepository.FindAll(x => x.Email == request.Email,
+                x => x.User).FirstOrDefaultAsync(cancellationToken: cancellationToken);
+        if (customer is null)
         {
-            var customer =
-                await _customerRepository.FindSingleAsync(x => x.Email == request.Email, cancellationToken,
-                    x => x.User);
-            if (customer is null)
-            {
-                return Result.Failure(DomainError.CommonError.NotFound(nameof(Customer)));
-            }
-
-            if (customer.User.IsBanned)
-            {
-                return Result.Failure(DomainError.User.Banned);
-            }
-
-            var code = _jwtTokenGenerator.CreateVerifyCode();
-            customer.User.ResetPasswordCode = code;
-            _userRepository.Update(customer.User);
-            await _unitOfWork.SaveChangesAsync(cancellationToken);
-            var token = await _jwtTokenGenerator.GenerateToken(customer.User, TokenType.ResetPassword);
-            await _emailService.SendActivationEmailAsync(customer.Email, token, false, cancellationToken);
-            return Result.Success();
+            return Result.Failure(DomainError.CommonError.NotFound(nameof(Customer)));
         }
-        catch (Exception e)
+
+        if (customer.User.IsBanned)
         {
-            return Result.Failure(DomainError.CommonError.ExceptionHandled(e.Message));
+            return Result.Failure(DomainError.User.Banned);
         }
+
+        var code = _jwtTokenGenerator.CreateVerifyCode();
+        customer.User.ResetPasswordCode = code;
+        _userRepository.Update(customer.User);
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
+        var token = await _jwtTokenGenerator.GenerateToken(customer.User, TokenType.ResetPassword);
+        await _emailService.SendActivationEmailAsync(customer.Email, token, false, cancellationToken);
+        return Result.Success();
     }
 }
