@@ -30,24 +30,32 @@ public class ForgotPasswordCommandHandler : ICommandHandler<ForgotPasswordComman
 
     public async Task<Result> Handle(ForgotPasswordCommand request, CancellationToken cancellationToken)
     {
-        var customer =
-            await _customerRepository.FindSingleAsync(x => x.Email == request.Email, cancellationToken, x => x.User);
-        if (customer is null)
+        try
         {
-            return Result.Failure(DomainError.CommonError.NotFound(nameof(Customer)));
-        }
+            var customer =
+                await _customerRepository.FindSingleAsync(x => x.Email == request.Email, cancellationToken,
+                    x => x.User);
+            if (customer is null)
+            {
+                return Result.Failure(DomainError.CommonError.NotFound(nameof(Customer)));
+            }
 
-        if (customer.User.IsBanned)
+            if (customer.User.IsBanned)
+            {
+                return Result.Failure(DomainError.User.Banned);
+            }
+
+            var code = _jwtTokenGenerator.CreateVerifyCode();
+            customer.User.ResetPasswordCode = code;
+            _userRepository.Update(customer.User);
+            await _unitOfWork.SaveChangesAsync(cancellationToken);
+            var token = await _jwtTokenGenerator.GenerateToken(customer.User, TokenType.ResetPassword);
+            await _emailService.SendActivationEmailAsync(customer.Email, token, false, cancellationToken);
+            return Result.Success();
+        }
+        catch (Exception e)
         {
-            return Result.Failure(DomainError.User.Banned);
+            return Result.Failure(DomainError.CommonError.ExceptionHandled(e.Message));
         }
-
-        var code = _jwtTokenGenerator.CreateVerifyCode();
-        customer.User.ResetPasswordCode = code;
-        _userRepository.Update(customer.User);
-        await _unitOfWork.SaveChangesAsync(cancellationToken);
-        var token = await _jwtTokenGenerator.GenerateToken(customer.User, TokenType.ResetPassword);
-        await _emailService.SendActivationEmailAsync(customer.Email, token, false, cancellationToken);
-        return Result.Success();
     }
 }
