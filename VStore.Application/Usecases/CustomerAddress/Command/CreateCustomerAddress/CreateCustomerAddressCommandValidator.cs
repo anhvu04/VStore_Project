@@ -3,7 +3,7 @@ using VStore.Application.Validators;
 
 namespace VStore.Application.Usecases.CustomerAddress.Command.CreateCustomerAddress;
 
-public class CreateCustomerAddressCommandValidator : AbstractValidator<CreateCustomerAddressAddressCommand>
+public class CreateCustomerAddressCommandValidator : AbstractValidator<CreateCustomerAddressCommand>
 {
     public CreateCustomerAddressCommandValidator()
     {

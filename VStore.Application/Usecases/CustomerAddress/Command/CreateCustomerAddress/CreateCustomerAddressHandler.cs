@@ -7,7 +7,7 @@ using VStore.Domain.Shared;
 
 namespace VStore.Application.Usecases.CustomerAddress.Command.CreateCustomerAddress;
 
-public class CreateCustomerAddressHandler : ICommandHandler<CreateCustomerAddressAddressCommand>
+public class CreateCustomerAddressHandler : ICommandHandler<CreateCustomerAddressCommand>
 {
     private readonly IUnitOfWork _unitOfWork;
     private readonly ICustomerAddressRepository _customerAddressRepository;
@@ -21,7 +21,7 @@ public class CreateCustomerAddressHandler : ICommandHandler<CreateCustomerAddres
         _mapper = mapper;
     }
 
-    public async Task<Result> Handle(CreateCustomerAddressAddressCommand request, CancellationToken cancellationToken)
+    public async Task<Result> Handle(CreateCustomerAddressCommand request, CancellationToken cancellationToken)
     {
         var customerAddress = await _customerAddressRepository
             .FindAll(x => x.CustomerId == request.UserId).ToListAsync(cancellationToken: cancellationToken);

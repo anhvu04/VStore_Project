@@ -4,6 +4,7 @@ using VStore.Application.Usecases.CustomerAddress.Common;
 
 namespace VStore.Application.Usecases.CustomerAddress.Command.CreateCustomerAddress;
 
-public record CreateCustomerAddressAddressCommand([property: JsonIgnore] Guid UserId) : CustomerAddressModel, ICommand
+public record CreateCustomerAddressCommand([property: JsonIgnore] Guid UserId) : CustomerAddressModel, ICommand
 {
+    [JsonIgnore] public new Guid Id { get; init; }
 }
