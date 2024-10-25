@@ -30,6 +30,7 @@ public class CreateCustomerAddressHandler : ICommandHandler<CreateCustomerAddres
             return Result.Failure(DomainError.CustomerAddress.LimitAddress);
         }
 
+        // Automatically set the address as default if it's the first one.
         if (customerAddress.Count == 0)
         {
             request.IsDefault = true;
@@ -38,20 +39,11 @@ public class CreateCustomerAddressHandler : ICommandHandler<CreateCustomerAddres
         // If the request address is default and more than 1 address exists, then set the default address in db to false
         if (request.IsDefault && customerAddress.Count != 0)
         {
-            try
+            var addressDefault = customerAddress.FirstOrDefault(x => x.IsDefault);
+            if (addressDefault != null)
             {
-                var addressDefault = customerAddress.SingleOrDefault(x => x.IsDefault);
-                if (addressDefault == null)
-                {
-                    return Result.Failure(DomainError.CustomerAddress.DefaultAddressNotFoundOrMoreThanOne);
-                }
-
                 addressDefault.IsDefault = false;
                 _customerAddressRepository.Update(addressDefault);
-            }
-            catch (InvalidOperationException)
-            {
-                return Result.Failure(DomainError.CustomerAddress.DefaultAddressNotFoundOrMoreThanOne);
             }
         }
 

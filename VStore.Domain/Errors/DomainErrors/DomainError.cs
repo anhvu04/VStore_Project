@@ -106,5 +106,9 @@ public static class DomainError
 
         public static readonly Error DefaultAddressNotFoundOrMoreThanOne =
             new("Error.CustomerAddress.DefaultAddressNotFound", "Default address not found or more than one exists.");
+
+        public static readonly Error DeleteDefaultAddress =
+            new("Error.CustomerAddress.DeleteDefaultAddress",
+                "Cannot delete default address. Please set another address as default before deleting.");
     }
 }
