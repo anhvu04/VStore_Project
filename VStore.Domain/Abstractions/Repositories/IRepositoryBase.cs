@@ -18,6 +18,10 @@ public interface IRepositoryBase<TEntity, in TKey> where TEntity : EntityBase<TK
         CancellationToken cancellationToken = default,
         params Expression<Func<TEntity, object>>[] includes);
 
+    Task<TEntity?> FindFirstAsync(Expression<Func<TEntity, bool>>? predicate = null,
+        CancellationToken cancellationToken = default,
+        params Expression<Func<TEntity, object>>[] includes);
+
     void Add(TEntity entity);
     void Update(TEntity entity);
     void Remove(TEntity entity);

@@ -11,6 +11,9 @@ public static class DomainError
 
         public static Error AlreadyExists(string value) =>
             new($"Error.AlreadyExists.{value}", $"{value} already exists.");
+
+        public static Error ExceptionHandled(string value) =>
+            new($"Error.ExceptionHandled.{value}", $"Exception handled: {value}");
     }
 
     public static class Authentication
@@ -84,5 +87,24 @@ public static class DomainError
                 : $"Products {string.Join(", ", invalidProduct)} do not exist in cart.";
             return new("Error.Cart.ProductNotExistInCart", message);
         }
+    }
+
+    public static class ApiService
+    {
+        public static readonly Error ApiCallFail =
+            new("Error.ApiService.ApiCallFail", "Error when calling API.");
+
+        public static Error DeserializeFail(string eMessage) => new("Error.ApiService.DeserializeFail",
+            "Error when deserializing API response: " + eMessage);
+    }
+
+    public static class CustomerAddress
+    {
+        public static readonly Error LimitAddress =
+            new("Error.CustomerAddress.LimitAddress",
+                "You have reached the limit of addresses. Maximum is 3 addresses.");
+
+        public static readonly Error DefaultAddressNotFoundOrMoreThanOne =
+            new("Error.CustomerAddress.DefaultAddressNotFound", "Default address not found or more than one exists.");
     }
 }

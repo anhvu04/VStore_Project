@@ -1,7 +1,10 @@
+using System.Text.Json.Serialization;
+
 namespace VStore.Application.Usecases.CustomerAddress.Common;
 
 public record CustomerAddressModel
 {
+    public Guid Id { get; init; }
     public string? ReceiverName { get; init; }
     public string? PhoneNumber { get; init; } = "";
     public string? Address { get; init; }

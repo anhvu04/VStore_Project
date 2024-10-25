@@ -1,4 +1,6 @@
 using System.Linq.Expressions;
+using AutoMapper;
+using AutoMapper.QueryableExtensions;
 using Microsoft.EntityFrameworkCore;
 using VStore.Domain.Abstractions;
 using VStore.Domain.Abstractions.Repositories;
@@ -58,6 +60,14 @@ public abstract class RepositoryBase<TEntity, TKey> : IRepositoryBase<TEntity, T
     {
         return await FindAll(predicate, includes)
             .AnyAsync(cancellationToken);
+    }
+
+    public async Task<TEntity?> FindFirstAsync(Expression<Func<TEntity, bool>>? predicate = null,
+        CancellationToken cancellationToken = default,
+        params Expression<Func<TEntity, object>>[] includes)
+    {
+        return await FindAll(predicate, includes).AsTracking()
+            .FirstOrDefaultAsync(cancellationToken);
     }
 
     public void Add(TEntity entity)
