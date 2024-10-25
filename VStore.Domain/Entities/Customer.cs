@@ -15,5 +15,6 @@ public class Customer : EntityBase<Guid>
     [Column(TypeName = "varchar(255)")] public string? ProfilePictureUrl { get; set; }
     public virtual User User { get; set; } = null!;
     public virtual ICollection<Order> Orders { get; set; } = [];
+    public virtual ICollection<CustomerAddress> CustomerAddresses { get; set; } = [];
     public virtual Cart? Cart { get; set; }
 }
