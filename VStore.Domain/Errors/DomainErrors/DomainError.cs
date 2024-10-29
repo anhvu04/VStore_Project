@@ -126,6 +126,9 @@ public static class DomainError
     public static class Checkout
     {
         public static readonly Error PayOsError =
-            new("Error.Checkout.PayOsError", "Error when creating payment link.");
+            new("Error.Checkout.PayOsError", "Error when creating PayOs payment link.");
+
+        public static readonly Error VnPayError =
+            new("Error.Checkout.VnPay", "Error when creating VnPay payment link.");
     }
 }

@@ -20,7 +20,7 @@ public class PayOsService : IPayOsService
             _configuration["PayOs:ChecksumKey"]!);
     }
 
-    public async Task<ApiResponseModel> CreatePaymentLink(CreatePaymentModel model)
+    public async Task<ApiResponseModel> CreatePaymentLink(CreatePayOsPaymentModel model)
     {
         try
         {

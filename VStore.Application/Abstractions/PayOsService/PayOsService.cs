@@ -5,5 +5,5 @@ namespace VStore.Application.Abstractions.PayOsService;
 
 public interface IPayOsService
 {
-    Task<ApiResponseModel> CreatePaymentLink(CreatePaymentModel model);
+    Task<ApiResponseModel> CreatePaymentLink(CreatePayOsPaymentModel model);
 }

@@ -1,6 +1,6 @@
 namespace VStore.Application.Usecases.Checkout.Common;
 
-public class CreatePaymentModel
+public class CreatePayOsPaymentModel
 {
     public long OrderCode { get; set; }
     public int Amount { get; set; }
