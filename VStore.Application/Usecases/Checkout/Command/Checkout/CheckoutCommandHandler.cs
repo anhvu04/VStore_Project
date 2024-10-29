@@ -1,7 +1,9 @@
 using AutoMapper;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using VStore.Application.Abstractions.MediatR;
 using VStore.Application.Abstractions.PayOsService;
+using VStore.Application.Abstractions.VNPayService;
 using VStore.Application.Usecases.Checkout.Common;
 using VStore.Domain.Abstractions;
 using VStore.Domain.Abstractions.Repositories;
@@ -23,11 +25,12 @@ public class CheckoutCommandHandler : ICommandHandler<CheckoutCommand, CheckoutR
     private readonly ICartDetailRepository _cartDetailRepository;
     private readonly IProductRepository _productRepository;
     private readonly IPayOsService _payOsService;
+    private readonly IVnPayService _vnPayService;
 
     public CheckoutCommandHandler(ICartRepository cartRepository, IUnitOfWork unitOfWork, IMapper mapper,
         ICustomerAddressRepository customerAddressRepository, IOrderRepository orderRepository,
         IOrderDetailRepository orderDetailRepository, ICartDetailRepository cartDetailRepository,
-        IProductRepository productRepository, IPayOsService payOsService)
+        IProductRepository productRepository, IPayOsService payOsService, IVnPayService vnPayService)
     {
         _cartRepository = cartRepository;
         _unitOfWork = unitOfWork;
@@ -38,6 +41,7 @@ public class CheckoutCommandHandler : ICommandHandler<CheckoutCommand, CheckoutR
         _cartDetailRepository = cartDetailRepository;
         _productRepository = productRepository;
         _payOsService = payOsService;
+        _vnPayService = vnPayService;
     }
 
     public async Task<Result<CheckoutResponseModel>> Handle(CheckoutCommand request,
@@ -132,6 +136,11 @@ public class CheckoutCommandHandler : ICommandHandler<CheckoutCommand, CheckoutR
             res = await HandlePayOsPayment(order, orderDetail);
         }
 
+        if (request.PaymentMethod == (int)PaymentMethod.Vnpay)
+        {
+            res = HandleVnPayPayment(request.HttpContext!, order);
+        }
+
         // if no error, save changes    
         if (res.Error == null)
         {
@@ -152,7 +161,7 @@ public class CheckoutCommandHandler : ICommandHandler<CheckoutCommand, CheckoutR
     /// <returns></returns>
     private async Task<Result<CheckoutResponseModel>> HandlePayOsPayment(Order order, List<OrderDetail> orderDetail)
     {
-        var payment = await _payOsService.CreatePaymentLink(new CreatePaymentModel
+        var payment = await _payOsService.CreatePaymentLink(new CreatePayOsPaymentModel
         {
             OrderCode = (long)order.TransactionCode!,
             Amount = order.TotalAmount,
@@ -167,6 +176,35 @@ public class CheckoutCommandHandler : ICommandHandler<CheckoutCommand, CheckoutR
         return Result<CheckoutResponseModel>.Success(new CheckoutResponseModel
         {
             CheckoutUrl = payment.Data!.ToString()!
+        });
+    }
+
+    /// <summary>
+    /// handle payment by VnPay
+    /// </summary>
+    /// <param name="context"></param>
+    /// <param name="order"></param>
+    /// <returns></returns>
+    private Result<CheckoutResponseModel> HandleVnPayPayment(HttpContext context, Order order)
+    {
+        var vnpayModel = new CreateVnPayPaymentModel
+        {
+            TxnRef = (long)order.TransactionCode!,
+            Amount = order.TotalAmount,
+            OrderInfo = $"{order.TransactionCode} | Shipfee: {order.ShippingFee}đ",
+            OrderType = "other",
+            IpAddr = context.Connection.RemoteIpAddress?.ToString()!
+        };
+
+        var vnpayUrl = _vnPayService.CreatePaymentLink(vnpayModel);
+        if (vnpayUrl.Code != 200)
+        {
+            return Result<CheckoutResponseModel>.Failure(DomainError.Checkout.VnPayError);
+        }
+
+        return Result<CheckoutResponseModel>.Success(new CheckoutResponseModel
+        {
+            CheckoutUrl = vnpayUrl.Data!.ToString()!
         });
     }
 

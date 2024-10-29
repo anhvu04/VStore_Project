@@ -20,7 +20,7 @@ public class CheckoutController(ISender sender) : ApiController(sender)
     {
         var userId = Guid.Parse(HttpContext.User.Claims.FirstOrDefault(c => c.Type == "UserId")?.Value ??
                                 Guid.Empty.ToString());
-        command = command with { UserId = userId };
+        command = command with { UserId = userId, HttpContext = HttpContext };
         var res = await Sender.Send(command);
         return res.IsSuccess ? Ok(res.Value) : BadRequest(res.Error);
     }
