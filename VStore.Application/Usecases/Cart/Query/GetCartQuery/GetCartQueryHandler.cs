@@ -1,3 +1,4 @@
+using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using VStore.Application.Abstractions.CartService;
 using VStore.Application.Abstractions.MediatR;
@@ -16,12 +17,15 @@ public class GetCartQueryHandler : IQueryHandler<GetCartQuery, CartModel>
     private readonly ICartRepository _cartRepository;
     private readonly IUnitOfWork _unitOfWork;
     private readonly ICartService _cartService;
+    private readonly IMapper _mapper;
 
-    public GetCartQueryHandler(ICartRepository cartRepository, IUnitOfWork unitOfWork, ICartService cartService)
+    public GetCartQueryHandler(ICartRepository cartRepository, IUnitOfWork unitOfWork, ICartService cartService,
+        IMapper mapper)
     {
         _cartRepository = cartRepository;
         _unitOfWork = unitOfWork;
         _cartService = cartService;
+        _mapper = mapper;
     }
 
     #region ChatGPT suggestion
@@ -34,18 +38,7 @@ public class GetCartQueryHandler : IQueryHandler<GetCartQuery, CartModel>
             .Select(cart => new
             {
                 CartDetails = cart.CartDetails
-                    .Select(cd => new CartDetailModel
-                    {
-                        ProductId = cd.ProductId,
-                        ProductName = cd.Product.Name,
-                        BrandName = cd.Product.Brand.Name,
-                        CategoryName = cd.Product.Category.Name,
-                        UnitPrice = cd.Product.SalePrice == 0 ? cd.Product.OriginalPrice : cd.Product.SalePrice,
-                        Quantity = cd.Quantity,
-                        TotalPrice = cd.Product.SalePrice == 0
-                            ? cd.Product.OriginalPrice * cd.Quantity
-                            : cd.Product.SalePrice * cd.Quantity
-                    })
+                    .Select(cd => _mapper.Map<CartDetailModel>(cd))
                     .Skip((request.Page - 1) * request.PageSize) // early pagination (query in database)
                     .Take(request.PageSize)
                     .ToList(),

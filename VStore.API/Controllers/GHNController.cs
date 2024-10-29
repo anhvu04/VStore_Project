@@ -8,7 +8,7 @@ namespace VStore.API.Controllers;
 
 [ApiController]
 [Route("api/ghn")]
-public class GHNController(ISender sender) : ApiController(sender)
+public class GhnController(ISender sender) : ApiController(sender)
 {
     [HttpGet("province")]
     public async Task<IActionResult> GetProvince()

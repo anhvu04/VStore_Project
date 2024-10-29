@@ -5,6 +5,7 @@ using Microsoft.IdentityModel.Tokens;
 using VStore.Application.Abstractions.Authentication;
 using VStore.Application.Abstractions.BCrypt;
 using VStore.Application.Abstractions.EmailService;
+using VStore.Application.Abstractions.PayOsService;
 using VStore.Domain.AuthenticationScheme;
 using VStore.Infrastructure.BCryptService;
 using VStore.Infrastructure.DependencyInjection.Options;
@@ -75,5 +76,6 @@ public static class ServiceCollectionExtensions
     {
         services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
         services.AddScoped<IPasswordHasher, BCryptPasswordHasher>();
+        services.AddSingleton<IPayOsService, PayOsService.PayOsService>();
     }
 }

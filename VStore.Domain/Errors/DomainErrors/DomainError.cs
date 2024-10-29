@@ -87,6 +87,17 @@ public static class DomainError
                 : $"Products {string.Join(", ", invalidProduct)} do not exist in cart.";
             return new("Error.Cart.ProductNotExistInCart", message);
         }
+
+        public static readonly Error CartNotFoundOrEmpty =
+            new("Error.Cart.CartNotFoundOrEmpty", $"Cart not found or empty.");
+
+        public static Error ProductOutOfStock(List<string> unavailableProducts)
+        {
+            var message = unavailableProducts.Count == 1
+                ? $"Product {unavailableProducts.FirstOrDefault()} is out of stock."
+                : $"Products {string.Join(", ", unavailableProducts)} are out of stock.";
+            return new("Error.Cart.ProductOutOfStock", message);
+        }
     }
 
     public static class ApiService
@@ -110,5 +121,11 @@ public static class DomainError
         public static readonly Error DeleteDefaultAddress =
             new("Error.CustomerAddress.DeleteDefaultAddress",
                 "Cannot delete default address. Please set another address as default before deleting.");
+    }
+
+    public static class Checkout
+    {
+        public static readonly Error PayOsError =
+            new("Error.Checkout.PayOsError", "Error when creating payment link.");
     }
 }
