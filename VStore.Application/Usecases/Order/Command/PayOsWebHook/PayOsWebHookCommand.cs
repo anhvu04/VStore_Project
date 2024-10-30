@@ -7,7 +7,7 @@ public record PayOsWebHookCommand : ICommand<string>
     public required string Code { get; set; }
     public required string Desc { get; set; }
     public required bool Success { get; set; }
-    public required WebhookData Data { get; set; }
+    public required object webhookData { get; set; }
     public required string Signature { get; set; }
 }
 

@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using VStore.Application.Abstractions.MediatR;
 using VStore.Application.Abstractions.PayOsService;
+using VStore.Application.Usecases.Order.Common;
 using VStore.Domain.Abstractions;
 using VStore.Domain.Abstractions.Repositories;
 using VStore.Domain.Enums;
@@ -36,7 +37,14 @@ public class PayOsWebHookCommandHandler : ICommandHandler<PayOsWebHookCommand, s
             return Result<string>.Failure(DomainError.Checkout.PayOsWebhookError);
         }
 
-        var order = await _orderRepository.FindAll(x => x.TransactionCode == request.Data.orderCode)
+        var response = validateSignature.Data as PayOsWebHookResponse;
+        if (response == null)
+        {
+            _logger.LogInformation("Invalid response");
+            return Result<string>.Success("Invalid response");
+        }
+
+        var order = await _orderRepository.FindAll(x => x.TransactionCode == response.OrderCode)
             .FirstOrDefaultAsync(cancellationToken: cancellationToken);
         if (order == null)
         {
@@ -44,7 +52,7 @@ public class PayOsWebHookCommandHandler : ICommandHandler<PayOsWebHookCommand, s
             return Result<string>.Success("Order not found");
         }
 
-        if (request.Data.code == "00")
+        if (response.Code == "00")
         {
             _logger.LogInformation("Order {0} is paid", order.TransactionCode);
             order.Status = OrderStatus.Processing;
