@@ -8,7 +8,7 @@ namespace VStore.API.Controllers;
 [Route("api/webhook")]
 public class WebHook(ISender sender) : ApiController(sender)
 {
-    [HttpPost("payos")]
+    [HttpPost]
     public async Task<IActionResult> PayOsWebHook([FromBody] PayOsWebHookCommand command)
     {
         var res = await Sender.Send(command);
