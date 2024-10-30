@@ -34,7 +34,7 @@ public class PayOsWebHookCommandHandler : ICommandHandler<PayOsWebHookCommand, s
         if (validateSignature.Code != 200)
         {
             _logger.LogInformation("Invalid signature");
-            return Result<string>.Failure(DomainError.Checkout.PayOsWebhookError);
+            return Result<string>.Success("Invalid signature");
         }
 
         var response = validateSignature.Data as PayOsWebHookResponse;
