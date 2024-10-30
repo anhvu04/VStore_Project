@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore;
 using VStore.Application.Abstractions.Authentication;
 using VStore.Application.Abstractions.EmailService;
 using VStore.Application.Abstractions.MediatR;
@@ -31,7 +32,8 @@ public class ForgotPasswordCommandHandler : ICommandHandler<ForgotPasswordComman
     public async Task<Result> Handle(ForgotPasswordCommand request, CancellationToken cancellationToken)
     {
         var customer =
-            await _customerRepository.FindSingleAsync(x => x.Email == request.Email, cancellationToken, x => x.User);
+            await _customerRepository.FindAll(x => x.Email == request.Email,
+                x => x.User).FirstOrDefaultAsync(cancellationToken: cancellationToken);
         if (customer is null)
         {
             return Result.Failure(DomainError.CommonError.NotFound(nameof(Customer)));

@@ -14,11 +14,17 @@ public class Order : EntityBase<Guid>, IDateTracking
     [Range(1, int.MaxValue)] public int TotalGram { get; set; }
     [Column(TypeName = "nvarchar(max)")] public string? Note { get; set; }
     [Required] public string ReceiverName { get; set; } = null!;
-    [Required] [Range(10, 10)] public int PhoneNumber { get; set; }
+    [Required] public string PhoneNumber { get; set; } = null!;
     [Required] [EmailAddress] public string Email { get; set; } = null!;
+
+    [Column(TypeName = "nvarchar(255)")]
+    [Required]
+    public string Address { get; set; }
+
+    [Range(0, int.MaxValue)] public int ProvinceId { get; set; }
     [Range(0, int.MaxValue)] public int DistrictId { get; set; }
     [Column(TypeName = "nvarchar(255)")] public string WardCode { get; set; } = null!;
-    [Column(TypeName = "varchar(255)")] public string? PaymentMethod { get; set; }
+    public PaymentMethod PaymentMethod { get; set; }
     public int? TransactionCode { get; set; }
     [Column(TypeName = "nvarchar(255)")] public string? ShippingCode { get; set; }
     public DateTime CreatedDate { get; set; }

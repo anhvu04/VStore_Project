@@ -1,4 +1,5 @@
 using System.Collections;
+using Microsoft.EntityFrameworkCore;
 using VStore.Application.Abstractions.MediatR;
 using VStore.Application.Usecases.Cart.Common;
 using VStore.Domain.Abstractions;
@@ -32,7 +33,8 @@ public class AddToCartCommandHandler : ICommandHandler<AddToCartCommand>
     public async Task<Result> Handle(AddToCartCommand request, CancellationToken cancellationToken)
     {
         var product =
-            await _productRepository.FindByIdAsync(request.ProductId, cancellationToken, x => x.Brand, x => x.Category);
+            await _productRepository.FindByIdAsync(request.ProductId, cancellationToken, x => x.Brand,
+                x => x.Category);
         if (product == null)
         {
             return Result.Failure(DomainError.CommonError.NotFound(nameof(Domain.Entities.Product)));
@@ -43,8 +45,8 @@ public class AddToCartCommandHandler : ICommandHandler<AddToCartCommand>
             return Result.Failure(DomainError.Product.NotEnoughQuantity);
         }
 
-        var cart = await _cartRepository.FindSingleAsync(x => x.CustomerId == request.UserId, cancellationToken,
-            x => x.CartDetails);
+        var cart = await _cartRepository.FindAll(x => x.CustomerId == request.UserId,
+            x => x.CartDetails).FirstOrDefaultAsync(cancellationToken: cancellationToken);
         if (cart == null)
         {
             cart = new Domain.Entities.Cart { CustomerId = request.UserId };

@@ -26,4 +26,5 @@ public class ApplicationDbContext : DbContext
     public virtual DbSet<Product> Products { get; set; }
     public virtual DbSet<User> Users { get; set; }
     public virtual DbSet<RefreshToken> RefreshTokens { get; set; }
+    public virtual DbSet<CustomerAddress> CustomerAddresses { get; set; }
 }

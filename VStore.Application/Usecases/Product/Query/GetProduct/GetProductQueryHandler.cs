@@ -1,4 +1,6 @@
 using AutoMapper;
+using AutoMapper.QueryableExtensions;
+using Microsoft.EntityFrameworkCore;
 using VStore.Application.Abstractions.MediatR;
 using VStore.Application.Usecases.Product.Common;
 using VStore.Domain.Abstractions.Repositories;
@@ -21,13 +23,16 @@ public class GetProductQueryHandler : IQueryHandler<GetProductQuery, ProductResp
     public async Task<Result<ProductResponseModel>> Handle(GetProductQuery request, CancellationToken cancellationToken)
     {
         var product =
-            await _productRepository.FindByIdAsync(request.Id, cancellationToken, x => x.Category, x => x.Brand);
+            await _productRepository
+                .FindAll(x => x.Id == request.Id, x => x.Category, x => x.Brand)
+                .ProjectTo<ProductResponseModel>(_mapper.ConfigurationProvider)
+                .FirstOrDefaultAsync(cancellationToken: cancellationToken);
         if (product is null)
         {
             return Result<ProductResponseModel>.Failure(
                 DomainError.CommonError.NotFound(nameof(Domain.Entities.Product)));
         }
 
-        return Result<ProductResponseModel>.Success(_mapper.Map<ProductResponseModel>(product));
+        return Result<ProductResponseModel>.Success(product);
     }
 }

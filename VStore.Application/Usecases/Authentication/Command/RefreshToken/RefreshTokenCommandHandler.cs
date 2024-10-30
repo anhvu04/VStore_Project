@@ -1,4 +1,5 @@
 using System.Security.Claims;
+using Microsoft.EntityFrameworkCore;
 using VStore.Application.Abstractions.Authentication;
 using VStore.Application.Abstractions.MediatR;
 using VStore.Application.Usecases.Authentication.Common;
@@ -40,11 +41,12 @@ public class RefreshTokenCommandHandler : ICommandHandler<RefreshTokenCommand, R
         }
 
         var token =
-            await _refreshTokenRepository.FindSingleAsync(x => x.Token == request.Token && x.UserId == user.Id,
-                cancellationToken);
+            await _refreshTokenRepository.FindAll(x => x.Token == request.Token && x.UserId == user.Id
+            ).FirstOrDefaultAsync(cancellationToken: cancellationToken);
         if (token is null)
         {
-            return Result<RefreshTokenResponseModel>.Failure(DomainError.CommonError.NotFound(nameof(RefreshToken)));
+            return Result<RefreshTokenResponseModel>.Failure(
+                DomainError.CommonError.NotFound(nameof(RefreshToken)));
         }
 
         if (token.IsExpired)

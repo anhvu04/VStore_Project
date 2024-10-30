@@ -1,5 +1,6 @@
 using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
+using VStore.Application.Abstractions.ApiService;
 using VStore.Application.Abstractions.CartService;
 using VStore.Application.Behaviors;
 using VStore.Application.Services;
@@ -24,5 +25,7 @@ public static class ServiceCollectionExtensions
     private static void AddDependencyInjection(this IServiceCollection services)
     {
         services.AddScoped<ICartService, CartService>();
+        services.AddSingleton<IApiService, ApiService>();
+        services.AddSingleton<HttpClient>();
     }
 }

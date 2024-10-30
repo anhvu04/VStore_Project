@@ -1,11 +1,11 @@
 using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 using VStore.Application.Abstractions.Authentication;
 using VStore.Application.Abstractions.BCrypt;
 using VStore.Application.Abstractions.MediatR;
 using VStore.Application.Usecases.Authentication.Common;
 using VStore.Domain.Abstractions;
 using VStore.Domain.Abstractions.Repositories;
-using VStore.Domain.Entities;
 using VStore.Domain.Enums;
 using VStore.Domain.Errors.DomainErrors;
 using VStore.Domain.Shared;
@@ -35,7 +35,8 @@ public class LoginCommandHandler : ICommandHandler<LoginCommand, LoginResponseMo
 
     public async Task<Result<LoginResponseModel>> Handle(LoginCommand request, CancellationToken cancellationToken)
     {
-        var user = await _userRepository.FindSingleAsync(x => x.UserName == request.Username, cancellationToken);
+        var user = await _userRepository.FindAll(x => x.UserName == request.Username)
+            .FirstOrDefaultAsync(cancellationToken);
         if (user == null)
         {
             return Result<LoginResponseModel>.Failure(DomainError.Authentication.IncorrectUsernameOrPassword);

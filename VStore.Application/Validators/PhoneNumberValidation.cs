@@ -8,8 +8,7 @@ public static class PhoneNumberValidation
     {
         const string pattern = @"(84|0[3|5|7|8|9])+([0-9]{8})\b";
         return ruleBuilder
-            .Must(x => x.Length == 10).WithMessage("Phone number must be 10 digits")
-            .Must(x => System.Text.RegularExpressions.Regex.IsMatch(x, pattern))
+            .Must(x => string.IsNullOrEmpty(x) || System.Text.RegularExpressions.Regex.IsMatch(x, pattern))
             .WithMessage("Phone number must be a valid phone number (+84)");
     }
 }

@@ -1,4 +1,6 @@
 using AutoMapper;
+using AutoMapper.QueryableExtensions;
+using Microsoft.EntityFrameworkCore;
 using VStore.Application.Abstractions.MediatR;
 using VStore.Application.Usecases.Brand.Common;
 using VStore.Domain.Abstractions.Repositories;
@@ -20,12 +22,14 @@ public class GetBrandQueryHandler : IQueryHandler<GetBrandQuery, BrandModel>
 
     public async Task<Result<BrandModel>> Handle(GetBrandQuery request, CancellationToken cancellationToken)
     {
-        var brand = await _brandRepository.FindByIdAsync(request.Id, cancellationToken);
+        var brand = await _brandRepository.FindAll(x => x.Id == request.Id)
+            .ProjectTo<BrandModel>(_mapper.ConfigurationProvider)
+            .FirstOrDefaultAsync(cancellationToken);
         if (brand == null)
         {
             return Result<BrandModel>.Failure(DomainError.CommonError.NotFound(nameof(Brand)));
         }
 
-        return Result<BrandModel>.Success(_mapper.Map<BrandModel>(brand));
+        return Result<BrandModel>.Success(brand);
     }
 }
