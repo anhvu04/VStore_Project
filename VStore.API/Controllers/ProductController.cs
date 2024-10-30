@@ -21,7 +21,7 @@ using VStore.Domain.Enums;
 
 namespace VStore.API.Controllers;
 
-[Route("api/product")]
+[Route("api/products")]
 public class ProductController(ISender sender) : ApiController(sender)
 {
     #region Products
