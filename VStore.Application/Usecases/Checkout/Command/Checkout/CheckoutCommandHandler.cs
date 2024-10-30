@@ -81,7 +81,7 @@ public class CheckoutCommandHandler : ICommandHandler<CheckoutCommand, CheckoutR
         }
 
         //add to order
-        var order = new Order
+        var order = new Domain.Entities.Order
         {
             TotalPrice = cart.TotalPrice,
             ShippingFee = request.ShippingFee,
@@ -159,7 +159,8 @@ public class CheckoutCommandHandler : ICommandHandler<CheckoutCommand, CheckoutR
     /// <param name="order"></param>
     /// <param name="orderDetail"></param>
     /// <returns></returns>
-    private async Task<Result<CheckoutResponseModel>> HandlePayOsPayment(Order order, List<OrderDetail> orderDetail)
+    private async Task<Result<CheckoutResponseModel>> HandlePayOsPayment(Domain.Entities.Order order,
+        List<OrderDetail> orderDetail)
     {
         var payment = await _payOsService.CreatePaymentLink(new CreatePayOsPaymentModel
         {
@@ -185,7 +186,7 @@ public class CheckoutCommandHandler : ICommandHandler<CheckoutCommand, CheckoutR
     /// <param name="context"></param>
     /// <param name="order"></param>
     /// <returns></returns>
-    private Result<CheckoutResponseModel> HandleVnPayPayment(HttpContext context, Order order)
+    private Result<CheckoutResponseModel> HandleVnPayPayment(HttpContext context, Domain.Entities.Order order)
     {
         var vnpayModel = new CreateVnPayPaymentModel
         {

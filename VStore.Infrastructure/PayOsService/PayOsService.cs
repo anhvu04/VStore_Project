@@ -18,6 +18,7 @@ public class PayOsService : IPayOsService
         _configuration = configuration;
         _payOs = new PayOS(_configuration["PayOs:ClientId"]!, _configuration["PayOs:ApiKey"]!,
             _configuration["PayOs:ChecksumKey"]!);
+        _payOs.confirmWebhook("https://localhost:5000/api/webhook/payos");
     }
 
     public async Task<ApiResponseModel> CreatePaymentLink(CreatePayOsPaymentModel model)

@@ -10,6 +10,8 @@
       <Folder Include="DependencyInjection\Options\" />
       <Folder Include="Exceptions\" />
       <Folder Include="Usecases\GHNAddress\" />
+      <Folder Include="Usecases\Order\Common\" />
+      <Folder Include="Usecases\Order\Query\" />
       <Folder Include="Usecases\User\Common\" />
       <Folder Include="Usecases\User\Query\" />
     </ItemGroup>
