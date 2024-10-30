@@ -21,7 +21,7 @@ public class PayOsService : IPayOsService
         _configuration = configuration;
         _payOs = new PayOS(_configuration["PayOs:ClientId"]!, _configuration["PayOs:ApiKey"]!,
             _configuration["PayOs:ChecksumKey"]!);
-        _payOs.confirmWebhook(_configuration["PayOs: WebhookUrl"]!);
+        _payOs.confirmWebhook(_configuration["PayOs:WebhookUrl"]!);
     }
 
     public async Task<ApiResponseModel> CreatePaymentLink(CreatePayOsPaymentModel model)
@@ -50,7 +50,7 @@ public class PayOsService : IPayOsService
     {
         try
         {
-            WebhookData webhookData = data.webhookData as WebhookData ?? throw new InvalidOperationException();
+            WebhookData webhookData = data.Data as WebhookData ?? throw new InvalidOperationException();
             var webHookData = new Net.payOS.Types.WebhookData(orderCode: webhookData.orderCode,
                 amount: webhookData.amount,
                 description: webhookData.description, accountNumber: webhookData.accountNumber,
