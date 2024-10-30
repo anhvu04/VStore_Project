@@ -22,8 +22,8 @@ public static class ServiceCollectionExtensions
         services.AddDbContextPool<DbContext, ApplicationDbContext>(builder =>
         {
             // Azure Connection String
-            var connectionString = configuration["AzureConnectionStrings:DefaultConnection"];
-            // var connectionString = configuration.GetConnectionString("DefaultConnection");
+            // var connectionString = configuration["AzureConnectionStrings:DefaultConnection"];
+            var connectionString = configuration.GetConnectionString("DefaultConnection");
             builder.EnableDetailedErrors()
                 .UseLazyLoadingProxies()
                 .UseSqlServer(connectionString);
