@@ -9,9 +9,8 @@ namespace VStore.API.Controllers;
 public class WebHook(ISender sender) : ApiController(sender)
 {
     [HttpPost("payos")]
-    public async Task<IActionResult> PayOsWebHook([FromBody] string data)
+    public async Task<IActionResult> PayOsWebHook([FromBody] PayOsWebHookCommand command)
     {
-        var command = new PayOsWebHookCommand(data);
         var res = await Sender.Send(command);
         return res.IsSuccess ? Ok() : BadRequest(res.Error);
     }
