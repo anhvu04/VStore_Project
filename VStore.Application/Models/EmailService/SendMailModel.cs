@@ -1,4 +1,4 @@
-namespace VStore.Application.Models;
+namespace VStore.Application.Models.EmailService;
 
 public class SendMailModel
 {

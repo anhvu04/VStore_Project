@@ -3,6 +3,7 @@ using System.Net.Mail;
 using Microsoft.Extensions.Options;
 using VStore.Application.Abstractions.EmailService;
 using VStore.Application.Models;
+using VStore.Application.Models.EmailService;
 using VStore.Domain.Shared;
 using VStore.Infrastructure.DependencyInjection.Options;
 

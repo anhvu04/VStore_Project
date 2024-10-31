@@ -1,4 +1,5 @@
 using VStore.Application.Models;
+using VStore.Application.Models.EmailService;
 using VStore.Domain.Shared;
 
 namespace VStore.Application.Abstractions.EmailService;
