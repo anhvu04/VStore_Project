@@ -1,8 +1,8 @@
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using Net.payOS.Types;
 using VStore.Application.Abstractions.PayOsService;
 using VStore.Application.Models.PayOsService;
+using WebhookType = Net.payOS.Types.WebhookType;
 
 namespace VStore.API.Controllers;
 
@@ -12,7 +12,7 @@ public class PayOsController(ISender sender, IPayOsService payOsService) : ApiCo
 {
     private readonly IPayOsService _payOsService = payOsService;
 
-    [HttpPost("webhook_")]
+    [HttpPost("webhook/verify")]
     public async Task<IActionResult> VerifyPayOsWebHook([FromBody] VerifyPayOsWebHookModel model)
     {
         var res = await _payOsService.VerifyPaymentWebHook(model);
@@ -22,8 +22,33 @@ public class PayOsController(ISender sender, IPayOsService payOsService) : ApiCo
     [HttpPost("webhook")]
     public async Task<IActionResult> VerifyPayOsWebHook([FromBody] WebhookType data)
     {
-        
-        var res = await _payOsService.VerifyPaymentWebHookType(data);
+        var webhookType = new WebhookTypeModel
+        {
+            Code = data.code,
+            Desc = data.desc,
+            Success = data.success,
+            Signature = data.signature,
+            Data = new WebhookDataModel
+            {
+                OrderCode = data.data.orderCode,
+                Amount = data.data.amount,
+                Description = data.data.description,
+                AccountNumber = data.data.accountNumber,
+                Reference = data.data.reference,
+                TransactionDateTime = data.data.transactionDateTime,
+                Currency = data.data.currency,
+                PaymentLinkId = data.data.paymentLinkId,
+                Code = data.data.code,
+                Desc = data.data.desc,
+                CounterAccountBankId = data.data.counterAccountBankId,
+                CounterAccountBankName = data.data.counterAccountBankName,
+                CounterAccountName = data.data.counterAccountName,
+                CounterAccountNumber = data.data.counterAccountNumber,
+                VirtualAccountName = data.data.virtualAccountName,
+                VirtualAccountNumber = data.data.virtualAccountNumber
+            }
+        };
+        var res = await _payOsService.VerifyPaymentWebHookType(webhookType);
         return res.IsSuccess ? Ok(res.Value) : BadRequest(res.Error);
     }
 

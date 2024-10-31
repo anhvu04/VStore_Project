@@ -67,19 +67,6 @@ public class Utils
 {
     public static string HmacSha256(string key, string data)
     {
-        // var keyBytes = Encoding.UTF8.GetBytes(key);
-        // using (HMACSHA256 hmac = new HMACSHA256(keyBytes))
-        // {
-        //     var dataBytes = Encoding.UTF8.GetBytes(data);
-        //     var hash = hmac.ComputeHash(dataBytes);
-        //     StringBuilder stringBuilder = new StringBuilder();
-        //     foreach (byte num in hash)
-        //     {
-        //         stringBuilder.Append(num.ToString("x2"));
-        //     }
-        //
-        //     return stringBuilder.ToString();
-        // }
         using (HMACSHA256 hmacshA256 = new HMACSHA256(Encoding.UTF8.GetBytes(key)))
         {
             byte[] hash = hmacshA256.ComputeHash(Encoding.UTF8.GetBytes(data));
