@@ -1,3 +1,4 @@
+using Net.payOS.Types;
 using VStore.Application.Models;
 using VStore.Application.Models.PayOsService;
 using VStore.Application.Usecases.Checkout.Common;
@@ -18,5 +19,6 @@ public interface IPayOsService
     Task<Result<PayOsWebHookResponseModel>> GetPaymentInformation(long orderCode,
         CancellationToken cancellationToken = default);
 
-    Task<Result<PayOsWebHookResponseModel>> VerifyPaymentWebHookType(WebhookTypeModel data);
+    // Task<Result<PayOsWebHookResponseModel>> VerifyPaymentWebHookType(WebhookTypeModel data);
+    Task<Result<PayOsWebHookResponseModel>> VerifyPaymentWebHookType(WebhookType data);
 }

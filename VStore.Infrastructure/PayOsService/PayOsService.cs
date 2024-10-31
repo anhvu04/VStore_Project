@@ -154,17 +154,18 @@ public class PayOsService : IPayOsService
         return Result<PayOsWebHookResponseModel>.Success(new PayOsWebHookResponseModel(true, data));
     }
 
-    public async Task<Result<PayOsWebHookResponseModel>> VerifyPaymentWebHookType(WebhookTypeModel data)
+    public async Task<Result<PayOsWebHookResponseModel>> VerifyPaymentWebHookType(WebhookType data)
     {
         try
         {
-            var webHookData = new WebhookData(data.Data.OrderCode, data.Data.Amount, data.Data.Description,
-                data.Data.AccountNumber, data.Data.Reference, data.Data.TransactionDateTime, data.Data.Currency,
-                data.Data.PaymentLinkId, data.Data.Code, data.Data.Desc, data.Data.CounterAccountBankId,
-                data.Data.CounterAccountBankName, data.Data.CounterAccountName, data.Data.CounterAccountNumber,
-                data.Data.VirtualAccountName, data.Data.VirtualAccountNumber);
-            var webHookType = new WebhookType(data.Code, data.Desc, data.Success, webHookData, data.Signature);
-            var res = _payOs.verifyPaymentWebhookData(webHookType);
+            // var webHookData = new WebhookData(data.Data.OrderCode, data.Data.Amount, data.Data.Description,
+            //     data.Data.AccountNumber, data.Data.Reference, data.Data.TransactionDateTime, data.Data.Currency,
+            //     data.Data.PaymentLinkId, data.Data.Code, data.Data.Desc, data.Data.CounterAccountBankId,
+            //     data.Data.CounterAccountBankName, data.Data.CounterAccountName, data.Data.CounterAccountNumber,
+            //     data.Data.VirtualAccountName, data.Data.VirtualAccountNumber);
+            // var webHookType = new WebhookType(data.Code, data.Desc, data.Success, webHookData, data.Signature);
+            // var res = _payOs.verifyPaymentWebhookData(webHookType);
+            var res = _payOs.verifyPaymentWebhookData(data);
             var serviceProvider = _serviceProvider.CreateScope();
             var orderRepository = serviceProvider.ServiceProvider.GetRequiredService<IOrderRepository>();
             var productRepository = serviceProvider.ServiceProvider.GetRequiredService<IProductRepository>();

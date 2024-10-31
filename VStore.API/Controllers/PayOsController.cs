@@ -22,33 +22,34 @@ public class PayOsController(ISender sender, IPayOsService payOsService) : ApiCo
     [HttpPost("webhook")]
     public async Task<IActionResult> VerifyPayOsWebHook([FromBody] WebhookType data)
     {
-        var webhookType = new WebhookTypeModel
-        {
-            Code = data.code,
-            Desc = data.desc,
-            Success = data.success,
-            Signature = data.signature,
-            Data = new WebhookDataModel
-            {
-                OrderCode = data.data.orderCode,
-                Amount = data.data.amount,
-                Description = data.data.description,
-                AccountNumber = data.data.accountNumber,
-                Reference = data.data.reference,
-                TransactionDateTime = data.data.transactionDateTime,
-                Currency = data.data.currency,
-                PaymentLinkId = data.data.paymentLinkId,
-                Code = data.data.code,
-                Desc = data.data.desc,
-                CounterAccountBankId = data.data.counterAccountBankId,
-                CounterAccountBankName = data.data.counterAccountBankName,
-                CounterAccountName = data.data.counterAccountName,
-                CounterAccountNumber = data.data.counterAccountNumber,
-                VirtualAccountName = data.data.virtualAccountName,
-                VirtualAccountNumber = data.data.virtualAccountNumber
-            }
-        };
-        var res = await _payOsService.VerifyPaymentWebHookType(webhookType);
+        // var webhookType = new WebhookTypeModel
+        // {
+        //     Code = data.code,
+        //     Desc = data.desc,
+        //     Success = data.success,
+        //     Signature = data.signature,
+        //     Data = new WebhookDataModel
+        //     {
+        //         OrderCode = data.data.orderCode,
+        //         Amount = data.data.amount,
+        //         Description = data.data.description,
+        //         AccountNumber = data.data.accountNumber,
+        //         Reference = data.data.reference,
+        //         TransactionDateTime = data.data.transactionDateTime,
+        //         Currency = data.data.currency,
+        //         PaymentLinkId = data.data.paymentLinkId,
+        //         Code = data.data.code,
+        //         Desc = data.data.desc,
+        //         CounterAccountBankId = data.data.counterAccountBankId,
+        //         CounterAccountBankName = data.data.counterAccountBankName,
+        //         CounterAccountName = data.data.counterAccountName,
+        //         CounterAccountNumber = data.data.counterAccountNumber,
+        //         VirtualAccountName = data.data.virtualAccountName,
+        //         VirtualAccountNumber = data.data.virtualAccountNumber
+        //     }
+        // };
+        // var res = await _payOsService.VerifyPaymentWebHookType(webhookType);
+        var res = await _payOsService.VerifyPaymentWebHookType(data);
         return res.IsSuccess ? Ok(res.Value) : BadRequest(res.Error);
     }
 
