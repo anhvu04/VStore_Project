@@ -1,8 +1,6 @@
 using System.Text.Json.Serialization;
-using VStore.Application.Abstractions.MediatR;
-using VStore.Application.Usecases.Order.Common;
 
-namespace VStore.Application.Usecases.Order.Command.PayOsWebHook;
+namespace VStore.Application.Models.PayOsService;
 
 public record VerifyPayOsWebHookModel
 {

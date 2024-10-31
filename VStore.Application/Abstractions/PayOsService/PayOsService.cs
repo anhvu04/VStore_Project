@@ -1,8 +1,6 @@
 using VStore.Application.Models;
 using VStore.Application.Models.PayOsService;
 using VStore.Application.Usecases.Checkout.Common;
-using VStore.Application.Usecases.Order.Command.PayOsWebHook;
-using VStore.Application.Usecases.Order.Common;
 using VStore.Domain.Shared;
 
 namespace VStore.Application.Abstractions.PayOsService;

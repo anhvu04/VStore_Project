@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace VStore.Application.Usecases.GHNAddress.Common;
+namespace VStore.Application.Usecases.GHNExpress.Common;
 
 public record GetProvinceModel
 {

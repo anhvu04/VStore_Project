@@ -2,7 +2,6 @@ using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using VStore.Application.Abstractions.PayOsService;
 using VStore.Application.Models.PayOsService;
-using VStore.Application.Usecases.Order.Command.PayOsWebHook;
 
 namespace VStore.API.Controllers;
 

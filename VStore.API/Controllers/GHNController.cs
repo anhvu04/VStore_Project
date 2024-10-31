@@ -1,8 +1,8 @@
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using VStore.Application.Usecases.GHNAddress.Query.GetDistrict;
-using VStore.Application.Usecases.GHNAddress.Query.GetProvince;
-using VStore.Application.Usecases.GHNAddress.Query.GetWard;
+using VStore.Application.Usecases.GHNExpress.Query.GetDistrict;
+using VStore.Application.Usecases.GHNExpress.Query.GetProvince;
+using VStore.Application.Usecases.GHNExpress.Query.GetWard;
 
 namespace VStore.API.Controllers;
 

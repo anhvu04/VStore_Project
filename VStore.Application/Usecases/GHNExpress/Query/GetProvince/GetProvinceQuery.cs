@@ -1,7 +1,7 @@
 using VStore.Application.Abstractions.MediatR;
-using VStore.Application.Usecases.GHNAddress.Common;
+using VStore.Application.Usecases.GHNExpress.Common;
 
-namespace VStore.Application.Usecases.GHNAddress.Query.GetProvince;
+namespace VStore.Application.Usecases.GHNExpress.Query.GetProvince;
 
 public class GetProvinceQuery : IQuery<List<GetProvinceModel>>
 {

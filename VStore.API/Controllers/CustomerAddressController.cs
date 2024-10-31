@@ -7,9 +7,6 @@ using VStore.Application.Usecases.CustomerAddress.Command.DeleteCustomerAddress;
 using VStore.Application.Usecases.CustomerAddress.Command.UpdateCustomerAddress;
 using VStore.Application.Usecases.CustomerAddress.Query.GetCustomerAddress;
 using VStore.Application.Usecases.CustomerAddress.Query.GetCustomerAddresses;
-using VStore.Application.Usecases.GHNAddress.Query.GetDistrict;
-using VStore.Application.Usecases.GHNAddress.Query.GetProvince;
-using VStore.Application.Usecases.GHNAddress.Query.GetWard;
 using VStore.Domain.AuthenticationScheme;
 using VStore.Domain.Enums;
 

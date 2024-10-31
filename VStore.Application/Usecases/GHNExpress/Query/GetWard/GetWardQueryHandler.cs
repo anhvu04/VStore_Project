@@ -3,11 +3,11 @@ using Microsoft.Extensions.Configuration;
 using VStore.Application.Abstractions.ApiService;
 using VStore.Application.Abstractions.MediatR;
 using VStore.Application.Models;
-using VStore.Application.Usecases.GHNAddress.Common;
+using VStore.Application.Usecases.GHNExpress.Common;
 using VStore.Domain.Errors.DomainErrors;
 using VStore.Domain.Shared;
 
-namespace VStore.Application.Usecases.GHNAddress.Query.GetWard;
+namespace VStore.Application.Usecases.GHNExpress.Query.GetWard;
 
 public class GetWardQueryHandler : IQueryHandler<GetWardQuery, List<GetWardModel>>
 {

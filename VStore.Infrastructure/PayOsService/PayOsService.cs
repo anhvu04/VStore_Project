@@ -10,8 +10,6 @@ using VStore.Application.Abstractions.PayOsService;
 using VStore.Application.Models;
 using VStore.Application.Models.PayOsService;
 using VStore.Application.Usecases.Checkout.Common;
-using VStore.Application.Usecases.Order.Command.PayOsWebHook;
-using VStore.Application.Usecases.Order.Common;
 using VStore.Domain.Abstractions;
 using VStore.Domain.Abstractions.Repositories;
 using VStore.Domain.Enums;
@@ -73,7 +71,8 @@ public class PayOsService : IPayOsService
         if (validateSignature.Code != 200)
         {
             _logger.LogInformation("Invalid signature");
-            return Result<PayOsWebHookResponseModel>.Failure(DomainError.PayOs.PayOsWebhookError);
+            return Result<PayOsWebHookResponseModel>.Success(
+                new PayOsWebHookResponseModel(false, "Invalid signature"));
         }
 
         var response = validateSignature.Data as VerifySignatureResponseModel;

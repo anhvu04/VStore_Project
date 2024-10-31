@@ -1,4 +1,4 @@
-namespace VStore.Application.Usecases.Order.Common;
+namespace VStore.Application.Models.PayOsService;
 
 public record PayOsWebHookResponseModel
 {
