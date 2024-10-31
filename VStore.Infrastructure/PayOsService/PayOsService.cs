@@ -162,7 +162,7 @@ public class PayOsService : IPayOsService
                               ?? throw new InvalidOperationException();
             AddResponseData(webhookData);
             var validateSignature =
-                _payOsLibrary.ValidateSignature(_configuration["PayOs:ChecksumKey"]!, data.Signature);
+                _payOsLibrary.ValidateSignature(_configuration["PayOS:ChecksumKey"]!, data.Signature);
             if (!validateSignature)
             {
                 return Task.FromResult(new ApiResponseModel(code: 400, data: null));
@@ -183,7 +183,7 @@ public class PayOsService : IPayOsService
     private Task<ApiResponseModel> CreatePayOsSignatureWebHook(CreatePayOsSignatureModel data)
     {
         AddResponseData(data);
-        var signature = _payOsLibrary.GenerateSignature(_configuration["PayOs:ChecksumKey"]!);
+        var signature = _payOsLibrary.GenerateSignature(_configuration["PayOS:ChecksumKey"]!);
         return Task.FromResult(new ApiResponseModel(code: 200, data: signature));
     }
 
