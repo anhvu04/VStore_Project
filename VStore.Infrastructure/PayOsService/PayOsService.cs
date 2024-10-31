@@ -154,6 +154,57 @@ public class PayOsService : IPayOsService
         return Result<PayOsWebHookResponseModel>.Success(new PayOsWebHookResponseModel(true, data));
     }
 
+    public async Task<Result<PayOsWebHookResponseModel>> VerifyPaymentWebHookType(WebhookType data)
+    {
+        try
+        {
+            var res = _payOs.verifyPaymentWebhookData(data);
+            var serviceProvider = _serviceProvider.CreateScope();
+            var orderRepository = serviceProvider.ServiceProvider.GetRequiredService<IOrderRepository>();
+            var productRepository = serviceProvider.ServiceProvider.GetRequiredService<IProductRepository>();
+            var unitOfWork = serviceProvider.ServiceProvider.GetRequiredService<IUnitOfWork>();
+            var order = await orderRepository.FindAll(x => x.TransactionCode == res.orderCode)
+                .Include(x => x.OrderDetails).ThenInclude(x => x.Product)
+                .FirstOrDefaultAsync(cancellationToken: default);
+            if (order == null)
+            {
+                _logger.LogInformation("Order not found");
+                return Result<PayOsWebHookResponseModel>.Success(
+                    new PayOsWebHookResponseModel(false, "Order not found"));
+            }
+
+            if (res.code == "00")
+            {
+                _logger.LogInformation("Order {0} is paid", order.TransactionCode);
+                order.Status = OrderStatus.Processing;
+            }
+            else
+            {
+                _logger.LogInformation("Order {0} is not paid", order.TransactionCode);
+                order.Status = OrderStatus.Canceled;
+                foreach (var product in order.OrderDetails)
+                {
+                    if (product.Product.Status == ProductStatus.OutOfStock)
+                    {
+                        product.Product.Status = ProductStatus.Selling;
+                    }
+
+                    product.Product.Quantity += product.Quantity;
+                    productRepository.Update(product.Product);
+                }
+            }
+
+            orderRepository.Update(order);
+            await unitOfWork.SaveChangesAsync(cancellationToken: default);
+            return Result<PayOsWebHookResponseModel>.Success(
+                new PayOsWebHookResponseModel(true, "Success update order"));
+        }
+        catch (Exception)
+        {
+            return Result<PayOsWebHookResponseModel>.Failure(DomainError.PayOs.PayOsWebhookError);
+        }
+    }
+
     private Task<ApiResponseModel> VerifyPaymentWebHook(VerifyPayOsWebHookModel data)
     {
         try

@@ -1,5 +1,6 @@
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using Net.payOS.Types;
 using VStore.Application.Abstractions.PayOsService;
 using VStore.Application.Models.PayOsService;
 
@@ -11,10 +12,18 @@ public class PayOsController(ISender sender, IPayOsService payOsService) : ApiCo
 {
     private readonly IPayOsService _payOsService = payOsService;
 
-    [HttpPost("webhook")]
+    [HttpPost("webhook_")]
     public async Task<IActionResult> VerifyPayOsWebHook([FromBody] VerifyPayOsWebHookModel model)
     {
         var res = await _payOsService.VerifyPaymentWebHook(model);
+        return res.IsSuccess ? Ok(res.Value) : BadRequest(res.Error);
+    }
+
+    [HttpPost("webhook")]
+    public async Task<IActionResult> VerifyPayOsWebHook([FromBody] WebhookType data)
+    {
+        
+        var res = await _payOsService.VerifyPaymentWebHookType(data);
         return res.IsSuccess ? Ok(res.Value) : BadRequest(res.Error);
     }
 
