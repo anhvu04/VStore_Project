@@ -105,7 +105,7 @@ public class PayOsService : IPayOsService
         else
         {
             _logger.LogInformation("Order {0} is not paid", order.TransactionCode);
-            order.Status = OrderStatus.Canceled;
+            order.Status = OrderStatus.Cancelled;
             foreach (var product in order.OrderDetails)
             {
                 if (product.Product.Status == ProductStatus.OutOfStock)
@@ -187,7 +187,7 @@ public class PayOsService : IPayOsService
             else
             {
                 _logger.LogInformation("Order {0} is not paid", order.TransactionCode);
-                order.Status = OrderStatus.Canceled;
+                order.Status = OrderStatus.Cancelled;
                 foreach (var product in order.OrderDetails)
                 {
                     if (product.Product.Status == ProductStatus.OutOfStock)

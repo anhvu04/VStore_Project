@@ -6,7 +6,7 @@ public class WebhookTypeModel
 {
     [JsonPropertyName("code")] public string Code { get; set; }
     [JsonPropertyName("desc")] public string Desc { get; set; }
-    public bool Success { get; set; }
+    [JsonPropertyName("success")] public bool Success { get; set; }
     [JsonPropertyName("data")] public WebhookDataModel Data { get; set; }
     [JsonPropertyName("signature")] public string Signature { get; set; }
 }
@@ -17,22 +17,22 @@ public class WebhookDataModel
 
     [JsonPropertyName("amount")] public int Amount { get; set; }
 
-    [JsonPropertyName("description")] public string Description { get; set; }
+    [JsonPropertyName("description")] public string? Description { get; set; }
 
-    [JsonPropertyName("accountNumber")] public string AccountNumber { get; set; }
+    [JsonPropertyName("accountNumber")] public string? AccountNumber { get; set; }
 
-    [JsonPropertyName("reference")] public string Reference { get; set; }
+    [JsonPropertyName("reference")] public string? Reference { get; set; }
 
     [JsonPropertyName("transactionDateTime")]
-    public string TransactionDateTime { get; set; }
+    public string? TransactionDateTime { get; set; }
 
-    [JsonPropertyName("currency")] public string Currency { get; set; }
+    [JsonPropertyName("currency")] public string? Currency { get; set; }
 
-    [JsonPropertyName("paymentLinkId")] public string PaymentLinkId { get; set; }
+    [JsonPropertyName("paymentLinkId")] public string? PaymentLinkId { get; set; }
 
-    [JsonPropertyName("code")] public string Code { get; set; }
+    [JsonPropertyName("code")] public string? Code { get; set; }
 
-    [JsonPropertyName("desc")] public string Desc { get; set; }
+    [JsonPropertyName("desc")] public string? Desc { get; set; }
 
     [JsonPropertyName("counterAccountBankId")]
     public string? CounterAccountBankId { get; set; }
@@ -50,5 +50,5 @@ public class WebhookDataModel
     public string? VirtualAccountName { get; set; }
 
     [JsonPropertyName("virtualAccountNumber")]
-    public string VirtualAccountNumber { get; set; }
+    public string? VirtualAccountNumber { get; set; }
 }
