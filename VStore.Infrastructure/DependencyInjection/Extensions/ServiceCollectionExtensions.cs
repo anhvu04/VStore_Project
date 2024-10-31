@@ -12,6 +12,7 @@ using VStore.Infrastructure.BCryptService;
 using VStore.Infrastructure.DependencyInjection.Options;
 using VStore.Infrastructure.EmailService;
 using VStore.Infrastructure.JwtBearerService;
+using VStore.Infrastructure.PayOsService;
 using VStore.Infrastructure.VNPayService;
 
 namespace VStore.Infrastructure.DependencyInjection.Extensions;
@@ -81,5 +82,6 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<IPayOsService, PayOsService.PayOsService>();
         services.AddSingleton<IVnPayService, VnPayService>();
         services.AddSingleton<VnPayLibrary>();
+        services.AddSingleton<PayOsLibrary>();
     }
 }

@@ -128,10 +128,17 @@ public static class DomainError
         public static readonly Error PayOsError =
             new("Error.Checkout.PayOsError", "Error when creating PayOs payment link.");
 
-        public static readonly Error PayOsWebhookError =
-            new("Error.Checkout.WebhookError", "Error when handling PayOs webhook. Please check the signature.");
 
         public static readonly Error VnPayError =
             new("Error.Checkout.VnPay", "Error when creating VnPay payment link.");
+    }
+
+    public static class PayOs
+    {
+        public static readonly Error PayOsWebhookError =
+            new("Error.Checkout.WebhookError", "Error when handling PayOs webhook. Please check the signature.");
+
+        public static readonly Error GetPaymentInfoError =
+            new("Error.Checkout.GetPaymentInfoError", "Error when getting payment information.");
     }
 }
