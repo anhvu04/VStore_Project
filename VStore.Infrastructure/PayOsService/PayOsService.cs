@@ -101,11 +101,6 @@ public class PayOsService : IPayOsService
         {
             _logger.LogInformation("Order {0} is paid", order.TransactionCode);
             order.Status = OrderStatus.Processing;
-            foreach (var product in order.OrderDetails)
-            {
-                product.Product.Quantity -= product.Quantity;
-                productRepository.Update(product.Product);
-            }
         }
         else
         {
@@ -113,6 +108,11 @@ public class PayOsService : IPayOsService
             order.Status = OrderStatus.Canceled;
             foreach (var product in order.OrderDetails)
             {
+                if (product.Product.Status == ProductStatus.OutOfStock)
+                {
+                    product.Product.Status = ProductStatus.Selling;
+                }
+
                 product.Product.Quantity += product.Quantity;
                 productRepository.Update(product.Product);
             }

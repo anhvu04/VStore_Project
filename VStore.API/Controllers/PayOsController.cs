@@ -15,7 +15,7 @@ public class PayOsController(ISender sender, IPayOsService payOsService) : ApiCo
     public async Task<IActionResult> VerifyPayOsWebHook([FromBody] VerifyPayOsWebHookModel model)
     {
         var res = await _payOsService.VerifyPaymentWebHook(model);
-        return res.IsSuccess ? Ok() : BadRequest(res.Error);
+        return res.IsSuccess ? Ok(res.Value) : BadRequest(res.Error);
     }
 
     [HttpPost("signature")]
