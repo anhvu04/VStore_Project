@@ -55,6 +55,7 @@ public class PayOsService : IPayOsService
                 returnUrl: _configuration["PayOs:ReturnUrl"]!,
                 expiredAt: DateTimeOffset.UtcNow.AddMinutes(15).ToUnixTimeSeconds()
             );
+            _logger.LogInformation("Create payment link with data: {0}", JsonSerializer.Serialize(paymentData));
             var payment = await _payOs.createPaymentLink(paymentData);
             return new ApiResponseModel(code: 200, data: payment.checkoutUrl);
         }
@@ -166,6 +167,8 @@ public class PayOsService : IPayOsService
             // var webHookType = new WebhookType(data.Code, data.Desc, data.Success, webHookData, data.Signature);
             // var res = _payOs.verifyPaymentWebhookData(webHookType);
             var res = _payOs.verifyPaymentWebhookData(data);
+            var json = JsonSerializer.Serialize(res);
+            _logger.LogInformation("Verify payment webhook data: {0}", json);
             var serviceProvider = _serviceProvider.CreateScope();
             var orderRepository = serviceProvider.ServiceProvider.GetRequiredService<IOrderRepository>();
             var productRepository = serviceProvider.ServiceProvider.GetRequiredService<IProductRepository>();
@@ -180,10 +183,10 @@ public class PayOsService : IPayOsService
                     new PayOsWebHookResponseModel(false, "Order not found"));
             }
 
-            if (res.code == "00")
+            if (data.success)
             {
                 _logger.LogInformation("Order {0} is paid", order.TransactionCode);
-                order.Status = OrderStatus.Cancelled;
+                order.Status = OrderStatus.Processing;
             }
             else
             {
