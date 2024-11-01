@@ -155,27 +155,23 @@ public class PayOsService : IPayOsService
         return Result<PayOsWebHookResponseModel>.Success(new PayOsWebHookResponseModel(true, data));
     }
 
-    public async Task<Result<PayOsWebHookResponseModel>> VerifyPaymentWebHookType(WebhookType data)
+    public async Task<Result<PayOsWebHookResponseModel>> VerifyPaymentWebHookType(WebhookTypeModel data)
     {
         try
         {
-            // var webHookData = new WebhookData(data.Data.OrderCode, data.Data.Amount, data.Data.Description,
-            //     data.Data.AccountNumber, data.Data.Reference, data.Data.TransactionDateTime, data.Data.Currency,
-            //     data.Data.PaymentLinkId, data.Data.Code, data.Data.Desc, data.Data.CounterAccountBankId,
-            //     data.Data.CounterAccountBankName, data.Data.CounterAccountName, data.Data.CounterAccountNumber,
-            //     data.Data.VirtualAccountName, data.Data.VirtualAccountNumber);
-            // var webHookType = new WebhookType(data.Code, data.Desc, data.Success, webHookData, data.Signature);
-            // var res = _payOs.verifyPaymentWebhookData(webHookType);
-            var res = _payOs.verifyPaymentWebhookData(data);
-            var json = JsonSerializer.Serialize(res);
-            _logger.LogInformation("Verify payment webhook data: {0}", json);
+            var webHookData = new WebhookData(data.Data.OrderCode, data.Data.Amount, data.Data.Description,
+                data.Data.AccountNumber, data.Data.Reference, data.Data.TransactionDateTime, data.Data.Currency,
+                data.Data.PaymentLinkId, data.Data.Code, data.Data.Desc, data.Data.CounterAccountBankId,
+                data.Data.CounterAccountBankName, data.Data.CounterAccountName, data.Data.CounterAccountNumber,
+                data.Data.VirtualAccountName, data.Data.VirtualAccountNumber);
+            var webHookType = new WebhookType(data.Code, data.Desc, data.Success, webHookData, data.Signature);
+            var res = _payOs.verifyPaymentWebhookData(webHookType);
             var serviceProvider = _serviceProvider.CreateScope();
             var orderRepository = serviceProvider.ServiceProvider.GetRequiredService<IOrderRepository>();
-            var productRepository = serviceProvider.ServiceProvider.GetRequiredService<IProductRepository>();
             var unitOfWork = serviceProvider.ServiceProvider.GetRequiredService<IUnitOfWork>();
             var order = await orderRepository.FindAll(x => x.TransactionCode == res.orderCode)
-                .Include(x => x.OrderDetails).ThenInclude(x => x.Product)
                 .FirstOrDefaultAsync(cancellationToken: default);
+
             if (order == null)
             {
                 _logger.LogInformation("Order not found");
@@ -183,27 +179,8 @@ public class PayOsService : IPayOsService
                     new PayOsWebHookResponseModel(false, "Order not found"));
             }
 
-            if (res.code == "00")
-            {
-                _logger.LogInformation("Order {0} is paid", order.TransactionCode);
-                order.Status = OrderStatus.Processing;
-            }
-            else
-            {
-                _logger.LogInformation("Order {0} is not paid", order.TransactionCode);
-                order.Status = OrderStatus.Cancelled;
-                foreach (var product in order.OrderDetails)
-                {
-                    if (product.Product.Status == ProductStatus.OutOfStock)
-                    {
-                        product.Product.Status = ProductStatus.Selling;
-                    }
-
-                    product.Product.Quantity += product.Quantity;
-                    productRepository.Update(product.Product);
-                }
-            }
-
+            _logger.LogInformation("Order {0} is paid", order.TransactionCode);
+            order.Status = OrderStatus.Processing;
             orderRepository.Update(order);
             await unitOfWork.SaveChangesAsync(cancellationToken: default);
             return Result<PayOsWebHookResponseModel>.Success(

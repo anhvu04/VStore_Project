@@ -11,12 +11,12 @@ using VStore.Domain.Shared;
 
 namespace VStore.Application.Usecases.Product.Query.GetProducts;
 
-public class GetProductQueryHandler : IQueryHandler<GetProductsQuery, PageList<ProductResponseModel>>
+public class GetProductsQueryHandler : IQueryHandler<GetProductsQuery, PageList<ProductResponseModel>>
 {
     private readonly IProductRepository _productRepository;
     private readonly IMapper _mapper;
 
-    public GetProductQueryHandler(IProductRepository productRepository, IMapper mapper)
+    public GetProductsQueryHandler(IProductRepository productRepository, IMapper mapper)
     {
         _productRepository = productRepository;
         _mapper = mapper;
@@ -25,7 +25,7 @@ public class GetProductQueryHandler : IQueryHandler<GetProductsQuery, PageList<P
     public async Task<Result<PageList<ProductResponseModel>>> Handle(GetProductsQuery request,
         CancellationToken cancellationToken)
     {
-        Expression<Func<Domain.Entities.Product, bool>> filter = x => true;
+        Expression<Func<Domain.Entities.Product, bool>> filter = x => !x.Brand.IsDeleted && !x.Category.IsDeleted;
         if (!string.IsNullOrEmpty(request.SearchTerm))
         {
             Expression<Func<Domain.Entities.Product, bool>> searchFilter = x =>
