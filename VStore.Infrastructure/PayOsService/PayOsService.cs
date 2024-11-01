@@ -183,7 +183,7 @@ public class PayOsService : IPayOsService
                     new PayOsWebHookResponseModel(false, "Order not found"));
             }
 
-            if (data.success)
+            if (res.code == "00")
             {
                 _logger.LogInformation("Order {0} is paid", order.TransactionCode);
                 order.Status = OrderStatus.Processing;
