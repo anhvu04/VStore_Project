@@ -1,0 +1,120 @@
+2024-11-01 11:18:33 [+00:00] [INF] (Microsoft.Hosting.Lifetime) Now listening on: "https://localhost:5000"
+2024-11-01 11:18:33 [+00:00] [INF] (Microsoft.Hosting.Lifetime) Now listening on: "http://localhost:5001"
+2024-11-01 11:18:33 [+00:00] [INF] (Microsoft.Hosting.Lifetime) Application started. Press Ctrl+C to shut down.
+2024-11-01 11:18:33 [+00:00] [INF] (Microsoft.Hosting.Lifetime) Hosting environment: "Development"
+2024-11-01 11:18:33 [+00:00] [INF] (Microsoft.Hosting.Lifetime) Content root path: "D:\ASP.NET CORE\Udemy_Project\VStore\VStore.API"
+2024-11-01 11:18:55 [+00:00] [WRN] (Microsoft.EntityFrameworkCore.Model.Validation) Entity '"Product"' has a global query filter defined and is the required end of a relationship with the entity '"CartDetail"'. This may lead to unexpected results when the required entity is filtered out. Either configure the navigation as optional, or define matching query filters for both entities in the navigation. See https://go.microsoft.com/fwlink/?linkid=2131316 for more information.
+2024-11-01 11:18:55 [+00:00] [WRN] (Microsoft.EntityFrameworkCore.Model.Validation) Entity '"User"' has a global query filter defined and is the required end of a relationship with the entity '"Customer"'. This may lead to unexpected results when the required entity is filtered out. Either configure the navigation as optional, or define matching query filters for both entities in the navigation. See https://go.microsoft.com/fwlink/?linkid=2131316 for more information.
+2024-11-01 11:18:55 [+00:00] [WRN] (Microsoft.EntityFrameworkCore.Model.Validation) Entity '"Product"' has a global query filter defined and is the required end of a relationship with the entity '"OrderDetail"'. This may lead to unexpected results when the required entity is filtered out. Either configure the navigation as optional, or define matching query filters for both entities in the navigation. See https://go.microsoft.com/fwlink/?linkid=2131316 for more information.
+2024-11-01 11:18:55 [+00:00] [WRN] (Microsoft.EntityFrameworkCore.Model.Validation) Entity '"User"' has a global query filter defined and is the required end of a relationship with the entity '"RefreshToken"'. This may lead to unexpected results when the required entity is filtered out. Either configure the navigation as optional, or define matching query filters for both entities in the navigation. See https://go.microsoft.com/fwlink/?linkid=2131316 for more information.
+2024-11-01 11:18:56 [+00:00] [INF] (Microsoft.EntityFrameworkCore.Database.Command) Executed DbCommand ("100"ms) [Parameters=["@__id_0='?' (DbType = Guid)"], CommandType='Text', CommandTimeout='30']"
+""SELECT TOP(2) [u].[Id], [u].[CreatedDate], [u].[DeletedDate], [u].[FirstName], [u].[IsActive], [u].[IsBanned], [u].[IsDeleted], [u].[LastName], [u].[ModifiedDate], [u].[Password], [u].[ResetPasswordCode], [u].[Role], [u].[Sex], [u].[UserName], [u].[VerificationCode]
+FROM [Users] AS [u]
+WHERE [u].[IsDeleted] = CAST(0 AS bit) AND [u].[Id] = @__id_0"
+2024-11-01 11:18:57 [+00:00] [INF] (Microsoft.EntityFrameworkCore.Database.Command) Executed DbCommand ("15"ms) [Parameters=["@__id_0='?' (DbType = Guid)"], CommandType='Text', CommandTimeout='30']"
+""SELECT TOP(2) [p].[Id], [p].[BrandId], [p].[CategoryId], [p].[CreatedBy], [p].[CreatedDate], [p].[DeletedDate], [p].[Description], [p].[Gram], [p].[IsActive], [p].[IsDeleted], [p].[ModifiedBy], [p].[ModifiedDate], [p].[Name], [p].[OriginalPrice], [p].[Quantity], [p].[SalePrice], [p].[Status], [p].[Thumbnail], [t].[Id], [t].[CreatedBy], [t].[CreatedDate], [t].[DeletedDate], [t].[Description], [t].[IsActive], [t].[IsDeleted], [t].[Logo], [t].[ModifiedBy], [t].[ModifiedDate], [t].[Name], [t0].[Id], [t0].[CreatedBy], [t0].[CreatedDate], [t0].[DeletedDate], [t0].[Description], [t0].[IsActive], [t0].[IsDeleted], [t0].[ModifiedBy], [t0].[ModifiedDate], [t0].[Name], [t0].[ParentId]
+FROM [Products] AS [p]
+INNER JOIN (
+    SELECT [b].[Id], [b].[CreatedBy], [b].[CreatedDate], [b].[DeletedDate], [b].[Description], [b].[IsActive], [b].[IsDeleted], [b].[Logo], [b].[ModifiedBy], [b].[ModifiedDate], [b].[Name]
+    FROM [Brands] AS [b]
+    WHERE [b].[IsDeleted] = CAST(0 AS bit)
+) AS [t] ON [p].[BrandId] = [t].[Id]
+INNER JOIN (
+    SELECT [c].[Id], [c].[CreatedBy], [c].[CreatedDate], [c].[DeletedDate], [c].[Description], [c].[IsActive], [c].[IsDeleted], [c].[ModifiedBy], [c].[ModifiedDate], [c].[Name], [c].[ParentId]
+    FROM [Categories] AS [c]
+    WHERE [c].[IsDeleted] = CAST(0 AS bit)
+) AS [t0] ON [p].[CategoryId] = [t0].[Id]
+WHERE [p].[IsDeleted] = CAST(0 AS bit) AND [p].[Id] = @__id_0"
+2024-11-01 11:18:57 [+00:00] [INF] (Microsoft.EntityFrameworkCore.Database.Command) Executed DbCommand ("4"ms) [Parameters=["@__request_UserId_0='?' (DbType = Guid)"], CommandType='Text', CommandTimeout='30']"
+""SELECT [t].[Id], [t].[CustomerId], [c0].[Id], [c0].[CartId], [c0].[ProductId], [c0].[Quantity]
+FROM (
+    SELECT TOP(1) [c].[Id], [c].[CustomerId]
+    FROM [Carts] AS [c]
+    WHERE [c].[CustomerId] = @__request_UserId_0
+) AS [t]
+LEFT JOIN [CartDetails] AS [c0] ON [t].[Id] = [c0].[CartId]
+ORDER BY [t].[Id]"
+2024-11-01 11:18:57 [+00:00] [WRN] (Microsoft.EntityFrameworkCore.Database.Transaction) Savepoints are disabled because Multiple Active Result Sets (MARS) is enabled. If 'SaveChanges' fails, then the transaction cannot be automatically rolled back to a known clean state. Instead, the transaction should be rolled back by the application before retrying 'SaveChanges'. See https://go.microsoft.com/fwlink/?linkid=2149338 for more information and examples. To identify the code which triggers this warning, call 'ConfigureWarnings(w => w.Throw(SqlServerEventId.SavepointsDisabledBecauseOfMARS))'.
+2024-11-01 11:18:57 [+00:00] [INF] (Microsoft.EntityFrameworkCore.Database.Command) Executed DbCommand ("11"ms) [Parameters=["@p0='?' (DbType = Guid), @p1='?' (DbType = Guid), @p2='?' (DbType = Guid), @p3='?' (DbType = Int32)"], CommandType='Text', CommandTimeout='30']"
+""SET IMPLICIT_TRANSACTIONS OFF;
+SET NOCOUNT ON;
+INSERT INTO [CartDetails] ([Id], [CartId], [ProductId], [Quantity])
+VALUES (@p0, @p1, @p2, @p3);"
+2024-11-01 11:19:04 [+00:00] [INF] (Microsoft.EntityFrameworkCore.Database.Command) Executed DbCommand ("7"ms) [Parameters=["@__id_0='?' (DbType = Guid)"], CommandType='Text', CommandTimeout='30']"
+""SELECT TOP(2) [u].[Id], [u].[CreatedDate], [u].[DeletedDate], [u].[FirstName], [u].[IsActive], [u].[IsBanned], [u].[IsDeleted], [u].[LastName], [u].[ModifiedDate], [u].[Password], [u].[ResetPasswordCode], [u].[Role], [u].[Sex], [u].[UserName], [u].[VerificationCode]
+FROM [Users] AS [u]
+WHERE [u].[IsDeleted] = CAST(0 AS bit) AND [u].[Id] = @__id_0"
+2024-11-01 11:19:04 [+00:00] [WRN] (Microsoft.EntityFrameworkCore.Query) Compiling a query which loads related collections for more than one collection navigation, either via 'Include' or through projection, but no 'QuerySplittingBehavior' has been configured. By default, Entity Framework will use 'QuerySplittingBehavior.SingleQuery', which can potentially result in slow query performance. See https://go.microsoft.com/fwlink/?linkid=2134277 for more information. To identify the query that's triggering this warning call 'ConfigureWarnings(w => w.Throw(RelationalEventId.MultipleCollectionIncludeWarning))'.
+2024-11-01 11:19:05 [+00:00] [INF] (Microsoft.EntityFrameworkCore.Database.Command) Executed DbCommand ("24"ms) [Parameters=["@__request_UserId_0='?' (DbType = Guid)"], CommandType='Text', CommandTimeout='30']"
+""SELECT [t].[Id], [t2].[Id], [t2].[CartId], [t2].[ProductId], [t2].[Quantity], [t2].[Id0], [t2].[BrandId], [t2].[CategoryId], [t2].[CreatedBy], [t2].[CreatedDate], [t2].[DeletedDate], [t2].[Description], [t2].[Gram], [t2].[IsActive], [t2].[IsDeleted], [t2].[ModifiedBy], [t2].[ModifiedDate], [t2].[Name], [t2].[OriginalPrice], [t2].[Quantity0], [t2].[SalePrice], [t2].[Status], [t2].[Thumbnail], [t4].[Id], [t4].[CartId], [t4].[ProductId], [t4].[Quantity], [t4].[Id0], [t4].[BrandId], [t4].[CategoryId], [t4].[CreatedBy], [t4].[CreatedDate], [t4].[DeletedDate], [t4].[Description], [t4].[Gram], [t4].[IsActive], [t4].[IsDeleted], [t4].[ModifiedBy], [t4].[ModifiedDate], [t4].[Name], [t4].[OriginalPrice], [t4].[Quantity0], [t4].[SalePrice], [t4].[Status], [t4].[Thumbnail], [t].[c], [t].[c0]
+FROM (
+    SELECT TOP(1) (
+        SELECT COALESCE(SUM([t0].[Gram] * [c0].[Quantity]), 0)
+        FROM [CartDetails] AS [c0]
+        INNER JOIN (
+            SELECT [p].[Id], [p].[BrandId], [p].[CategoryId], [p].[CreatedBy], [p].[CreatedDate], [p].[DeletedDate], [p].[Description], [p].[Gram], [p].[IsActive], [p].[IsDeleted], [p].[ModifiedBy], [p].[ModifiedDate], [p].[Name], [p].[OriginalPrice], [p].[Quantity], [p].[SalePrice], [p].[Status], [p].[Thumbnail]
+            FROM [Products] AS [p]
+            WHERE [p].[IsDeleted] = CAST(0 AS bit)
+        ) AS [t0] ON [c0].[ProductId] = [t0].[Id]
+        WHERE [c].[Id] = [c0].[CartId]) AS [c], (
+        SELECT COALESCE(SUM(CASE
+            WHEN [t1].[SalePrice] = 0 THEN [t1].[OriginalPrice] * [c1].[Quantity]
+            ELSE [t1].[SalePrice] * [c1].[Quantity]
+        END), 0)
+        FROM [CartDetails] AS [c1]
+        INNER JOIN (
+            SELECT [p0].[Id], [p0].[BrandId], [p0].[CategoryId], [p0].[CreatedBy], [p0].[CreatedDate], [p0].[DeletedDate], [p0].[Description], [p0].[Gram], [p0].[IsActive], [p0].[IsDeleted], [p0].[ModifiedBy], [p0].[ModifiedDate], [p0].[Name], [p0].[OriginalPrice], [p0].[Quantity], [p0].[SalePrice], [p0].[Status], [p0].[Thumbnail]
+            FROM [Products] AS [p0]
+            WHERE [p0].[IsDeleted] = CAST(0 AS bit)
+        ) AS [t1] ON [c1].[ProductId] = [t1].[Id]
+        WHERE [c].[Id] = [c1].[CartId]) AS [c0], [c].[Id]
+    FROM [Carts] AS [c]
+    WHERE [c].[CustomerId] = @__request_UserId_0
+) AS [t]
+LEFT JOIN (
+    SELECT [c2].[Id], [c2].[CartId], [c2].[ProductId], [c2].[Quantity], [t3].[Id] AS [Id0], [t3].[BrandId], [t3].[CategoryId], [t3].[CreatedBy], [t3].[CreatedDate], [t3].[DeletedDate], [t3].[Description], [t3].[Gram], [t3].[IsActive], [t3].[IsDeleted], [t3].[ModifiedBy], [t3].[ModifiedDate], [t3].[Name], [t3].[OriginalPrice], [t3].[Quantity] AS [Quantity0], [t3].[SalePrice], [t3].[Status], [t3].[Thumbnail]
+    FROM [CartDetails] AS [c2]
+    INNER JOIN (
+        SELECT [p1].[Id], [p1].[BrandId], [p1].[CategoryId], [p1].[CreatedBy], [p1].[CreatedDate], [p1].[DeletedDate], [p1].[Description], [p1].[Gram], [p1].[IsActive], [p1].[IsDeleted], [p1].[ModifiedBy], [p1].[ModifiedDate], [p1].[Name], [p1].[OriginalPrice], [p1].[Quantity], [p1].[SalePrice], [p1].[Status], [p1].[Thumbnail]
+        FROM [Products] AS [p1]
+        WHERE [p1].[IsDeleted] = CAST(0 AS bit)
+    ) AS [t3] ON [c2].[ProductId] = [t3].[Id]
+) AS [t2] ON [t].[Id] = [t2].[CartId]
+LEFT JOIN (
+    SELECT [c3].[Id], [c3].[CartId], [c3].[ProductId], [c3].[Quantity], [t5].[Id] AS [Id0], [t5].[BrandId], [t5].[CategoryId], [t5].[CreatedBy], [t5].[CreatedDate], [t5].[DeletedDate], [t5].[Description], [t5].[Gram], [t5].[IsActive], [t5].[IsDeleted], [t5].[ModifiedBy], [t5].[ModifiedDate], [t5].[Name], [t5].[OriginalPrice], [t5].[Quantity] AS [Quantity0], [t5].[SalePrice], [t5].[Status], [t5].[Thumbnail]
+    FROM [CartDetails] AS [c3]
+    INNER JOIN (
+        SELECT [p2].[Id], [p2].[BrandId], [p2].[CategoryId], [p2].[CreatedBy], [p2].[CreatedDate], [p2].[DeletedDate], [p2].[Description], [p2].[Gram], [p2].[IsActive], [p2].[IsDeleted], [p2].[ModifiedBy], [p2].[ModifiedDate], [p2].[Name], [p2].[OriginalPrice], [p2].[Quantity], [p2].[SalePrice], [p2].[Status], [p2].[Thumbnail]
+        FROM [Products] AS [p2]
+        WHERE [p2].[IsDeleted] = CAST(0 AS bit)
+    ) AS [t5] ON [c3].[ProductId] = [t5].[Id]
+) AS [t4] ON [t].[Id] = [t4].[CartId]
+ORDER BY [t].[Id], [t2].[Id], [t2].[Id0], [t4].[Id]"
+2024-11-01 11:19:05 [+00:00] [INF] (Microsoft.EntityFrameworkCore.Database.Command) Executed DbCommand ("4"ms) [Parameters=["@__request_UserId_0='?' (DbType = Guid), @__request_AddressId_1='?' (DbType = Guid)"], CommandType='Text', CommandTimeout='30']"
+""SELECT TOP(1) [c].[Id], [c].[Address], [c].[CustomerId], [c].[DistrictId], [c].[DistrictName], [c].[IsDefault], [c].[PhoneNumber], [c].[ProvinceId], [c].[ProvinceName], [c].[ReceiverName], [c].[WardCode], [c].[WardName], [c0].[UserId], [c0].[Address], [c0].[DateOfBirth], [c0].[Email], [c0].[GoogleId], [c0].[PhoneNumber], [c0].[ProfilePictureUrl]
+FROM [CustomerAddresses] AS [c]
+INNER JOIN [Customers] AS [c0] ON [c].[CustomerId] = [c0].[UserId]
+WHERE [c].[CustomerId] = @__request_UserId_0 AND [c].[Id] = @__request_AddressId_1"
+2024-11-01 11:19:05 [+00:00] [INF] (Microsoft.EntityFrameworkCore.Database.Command) Executed DbCommand ("3"ms) [Parameters=["@__orderCode_0='?' (DbType = Int32)"], CommandType='Text', CommandTimeout='30']"
+""SELECT CASE
+    WHEN EXISTS (
+        SELECT 1
+        FROM [Orders] AS [o]
+        WHERE [o].[TransactionCode] = @__orderCode_0) THEN CAST(1 AS bit)
+    ELSE CAST(0 AS bit)
+END"
+2024-11-01 11:19:05 [+00:00] [INF] (VStore.Infrastructure.PayOsService.PayOsService) Create payment link with data: "{\"orderCode\":5165505,\"amount\":6200,\"description\":\"5165505 | Shipfee: 5000\u0111\",\"items\":[{\"name\":\"Gi\u00E0y Nike s\u1ED1 1 VN\",\"quantity\":10,\"price\":1200}],\"cancelUrl\":\"http://localhost:5001/order/\",\"returnUrl\":\"http://localhost:5001/order/\",\"signature\":null,\"buyerName\":null,\"buyerEmail\":null,\"buyerPhone\":null,\"buyerAddress\":null,\"expiredAt\":1730435645}"
+2024-11-01 11:19:06 [+00:00] [WRN] (Microsoft.EntityFrameworkCore.Database.Transaction) Savepoints are disabled because Multiple Active Result Sets (MARS) is enabled. If 'SaveChanges' fails, then the transaction cannot be automatically rolled back to a known clean state. Instead, the transaction should be rolled back by the application before retrying 'SaveChanges'. See https://go.microsoft.com/fwlink/?linkid=2149338 for more information and examples. To identify the code which triggers this warning, call 'ConfigureWarnings(w => w.Throw(SqlServerEventId.SavepointsDisabledBecauseOfMARS))'.
+2024-11-01 11:19:06 [+00:00] [INF] (Microsoft.EntityFrameworkCore.Database.Command) Executed DbCommand ("20"ms) [Parameters=["@p0='?' (DbType = Guid), @p1='?' (DbType = Guid), @p2='?' (Size = 255), @p3='?' (DbType = DateTime2), @p4='?' (DbType = Guid), @p5='?' (DbType = Int32), @p6='?' (Size = 4000), @p7='?' (DbType = DateTime2), @p8='?' (Size = 4000), @p9='?' (DbType = Int32), @p10='?' (Size = 4000), @p11='?' (DbType = Int32), @p12='?' (Size = 4000), @p13='?' (Size = 255), @p14='?' (DbType = Int32), @p15='?' (DbType = Int32), @p16='?' (DbType = Int32), @p17='?' (DbType = Int32), @p18='?' (DbType = Int32), @p19='?' (DbType = Int32), @p20='?' (Size = 255), @p38='?' (DbType = Guid), @p21='?' (DbType = Int32), @p22='?' (DbType = Int32), @p23='?' (DbType = Guid), @p24='?' (DbType = DateTime2), @p25='?' (DbType = DateTime2), @p26='?' (Size = 4000), @p27='?' (DbType = Int32), @p28='?' (DbType = Boolean), @p29='?' (DbType = Boolean), @p30='?' (DbType = Guid), @p31='?' (DbType = DateTime2), @p32='?' (Size = 255), @p33='?' (DbType = Int32), @p34='?' (DbType = Int32), @p35='?' (DbType = Int32), @p36='?' (DbType = Int32), @p37='?' (Size = 255) (DbType = AnsiString), @p39='?' (DbType = Guid), @p40='?' (DbType = DateTime2), @p41='?' (DbType = Int32), @p42='?' (DbType = DateTime2), @p43='?' (DbType = Guid), @p44='?' (DbType = Guid), @p45='?' (Size = 255), @p46='?' (DbType = Int32), @p47='?' (Size = 255), @p48='?' (DbType = Int32)"], CommandType='Text', CommandTimeout='30']"
+""SET NOCOUNT ON;
+DELETE FROM [CartDetails]
+OUTPUT 1
+WHERE [Id] = @p0;
+INSERT INTO [Orders] ([Id], [Address], [CreatedDate], [CustomerId], [DistrictId], [Email], [ModifiedDate], [Note], [PaymentMethod], [PhoneNumber], [ProvinceId], [ReceiverName], [ShippingCode], [ShippingFee], [Status], [TotalAmount], [TotalGram], [TotalPrice], [TransactionCode], [WardCode])
+VALUES (@p1, @p2, @p3, @p4, @p5, @p6, @p7, @p8, @p9, @p10, @p11, @p12, @p13, @p14, @p15, @p16, @p17, @p18, @p19, @p20);
+UPDATE [Products] SET [BrandId] = @p21, [CategoryId] = @p22, [CreatedBy] = @p23, [CreatedDate] = @p24, [DeletedDate] = @p25, [Description] = @p26, [Gram] = @p27, [IsActive] = @p28, [IsDeleted] = @p29, [ModifiedBy] = @p30, [ModifiedDate] = @p31, [Name] = @p32, [OriginalPrice] = @p33, [Quantity] = @p34, [SalePrice] = @p35, [Status] = @p36, [Thumbnail] = @p37
+OUTPUT 1
+WHERE [Id] = @p38;
+INSERT INTO [OrderDetails] ([Id], [CreatedDate], [ItemPrice], [ModifiedDate], [OrderId], [ProductId], [ProductName], [Quantity], [Thumbnail], [UnitPrice])
+VALUES (@p39, @p40, @p41, @p42, @p43, @p44, @p45, @p46, @p47, @p48);"
+2024-11-01 11:19:24 [+00:00] [INF] (Microsoft.Hosting.Lifetime) Application is shutting down...
