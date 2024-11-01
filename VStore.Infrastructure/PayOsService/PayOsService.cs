@@ -183,7 +183,7 @@ public class PayOsService : IPayOsService
             if (res.code == "00")
             {
                 _logger.LogInformation("Order {0} is paid", order.TransactionCode);
-                order.Status = OrderStatus.Processing;
+                order.Status = OrderStatus.Cancelled;
             }
             else
             {
