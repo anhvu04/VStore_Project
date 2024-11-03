@@ -118,7 +118,7 @@ public class VnPayService : IVnPayService
                     };
                 }
 
-                var amount = int.Parse(_vnpay.GetResponseData("vnp_Amount"));
+                var amount = int.Parse(_vnpay.GetResponseData("vnp_Amount")) / 100;
                 if (order.TotalAmount != amount)
                 {
                     return new VnPayIpnResponse
