@@ -12,7 +12,6 @@ using VStore.Application.Models.PayOsService;
 using VStore.Application.Usecases.Checkout.Common;
 using VStore.Domain.Abstractions;
 using VStore.Domain.Abstractions.Repositories;
-using VStore.Domain.Entities;
 using VStore.Domain.Enums;
 using VStore.Domain.Errors.DomainErrors;
 using VStore.Domain.Shared;
@@ -176,8 +175,8 @@ public class PayOsService : IPayOsService
             if (order == null)
             {
                 _logger.LogInformation("Order not found");
-                return Result<PayOsWebHookResponseModel>.Failure(
-                    DomainError.CommonError.NotFound(nameof(Order)));
+                return Result<PayOsWebHookResponseModel>.Success(
+                    new PayOsWebHookResponseModel(false, "Order not found"));
             }
 
             _logger.LogInformation("Order {0} is paid", order.TransactionCode);
