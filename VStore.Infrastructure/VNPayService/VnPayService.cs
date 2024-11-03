@@ -85,7 +85,7 @@ public class VnPayService : IVnPayService
                 {
                     return new VnPayIpnResponse
                     {
-                        RspCode = "00", // invalid signature
+                        RspCode = "97", // invalid signature
                         Message = "Invalid signature"
                     };
                 }
@@ -104,7 +104,7 @@ public class VnPayService : IVnPayService
                 {
                     return new VnPayIpnResponse
                     {
-                        RspCode = "00", // order not found
+                        RspCode = "01", // order not found
                         Message = "Order not found"
                     };
                 }
@@ -113,7 +113,7 @@ public class VnPayService : IVnPayService
                 {
                     return new VnPayIpnResponse
                     {
-                        RspCode = "00", // order already confirmed
+                        RspCode = "02", // order already confirmed
                         Message = "Order already confirmed"
                     };
                 }
@@ -123,7 +123,7 @@ public class VnPayService : IVnPayService
                 {
                     return new VnPayIpnResponse
                     {
-                        RspCode = "00", // invalid amount
+                        RspCode = "04", // invalid amount
                         Message = "Invalid amount"
                     };
                 }
@@ -160,7 +160,7 @@ public class VnPayService : IVnPayService
 
             return new VnPayIpnResponse
             {
-                RspCode = "00", // invalid request
+                RspCode = "99", // invalid request
                 Message = "Invalid request"
             };
         }
@@ -168,7 +168,7 @@ public class VnPayService : IVnPayService
         {
             return new VnPayIpnResponse
             {
-                RspCode = "00", // unknown error
+                RspCode = "99", // unknown error
                 Message = e.Message
             };
         }
