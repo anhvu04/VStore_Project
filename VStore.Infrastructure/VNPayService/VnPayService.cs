@@ -38,8 +38,8 @@ public class VnPayService : IVnPayService
             _vnpay.ClearRequestSpecificData();
 
             _vnpay.AddRequestData("vnp_Amount", (model.Amount * 100).ToString());
-            _vnpay.AddRequestData("vnp_CreateDate", DateTime.Now.ToString("yyyyMMddHHmmss"));
-            _vnpay.AddRequestData("vnp_ExpireDate", DateTime.Now.AddMinutes(15).ToString("yyyyMMddHHmmss"));
+            _vnpay.AddRequestData("vnp_CreateDate", DateTime.UtcNow.ToString("yyyyMMddHHmmss"));
+            _vnpay.AddRequestData("vnp_ExpireDate", DateTime.UtcNow.AddMinutes(15).ToString("yyyyMMddHHmmss"));
             _vnpay.AddRequestData("vnp_OrderInfo", model.OrderInfo);
             _vnpay.AddRequestData("vnp_OrderType", model.OrderType);
             _vnpay.AddRequestData("vnp_TxnRef", model.TxnRef.ToString());
@@ -91,7 +91,7 @@ public class VnPayService : IVnPayService
                 var orderRepository = serviceProvider.ServiceProvider
                     .GetRequiredService<IOrderRepository>();
                 var productRepository = serviceProvider.ServiceProvider.GetRequiredService<IProductRepository>();
-                
+
                 var orderCode = long.Parse(_vnpay.GetResponseData("vnp_TxnRef"));
                 var order = await orderRepository.FindAll(x => x.TransactionCode == orderCode)
                     .Include(x => x.OrderDetails)
