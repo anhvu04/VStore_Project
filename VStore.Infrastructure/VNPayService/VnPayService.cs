@@ -158,7 +158,7 @@ public class VnPayService : IVnPayService
 
         return new VnPayIpnResponse
         {
-            RspCode = "99", // invalid request
+            RspCode = "00", // invalid request
             Message = "Input data required"
         };
     }
