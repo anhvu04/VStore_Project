@@ -1,4 +1,4 @@
-namespace VStore.Application.Usecases.Checkout.Common;
+namespace VStore.Application.Models.VnPayService;
 
 public class CreateVnPayPaymentModel
 {

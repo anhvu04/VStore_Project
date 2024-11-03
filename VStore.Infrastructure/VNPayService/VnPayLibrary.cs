@@ -48,6 +48,11 @@ public class VnPayLibrary
         }
     }
 
+    public void ClearResponseData()
+    {
+        _responseData.Clear();
+    }
+
     public string GetResponseData(string key)
     {
         return _responseData.TryGetValue(key, out var retValue) ? retValue : string.Empty;

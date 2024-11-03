@@ -4,6 +4,8 @@ using Microsoft.EntityFrameworkCore;
 using VStore.Application.Abstractions.MediatR;
 using VStore.Application.Abstractions.PayOsService;
 using VStore.Application.Abstractions.VNPayService;
+using VStore.Application.Models.PayOsService;
+using VStore.Application.Models.VnPayService;
 using VStore.Application.Usecases.Checkout.Common;
 using VStore.Domain.Abstractions;
 using VStore.Domain.Abstractions.Repositories;
