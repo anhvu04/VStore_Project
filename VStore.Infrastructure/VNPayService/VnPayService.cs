@@ -36,10 +36,14 @@ public class VnPayService : IVnPayService
         {
             // Clear all request data before adding new data
             _vnpay.ClearRequestSpecificData();
-
             _vnpay.AddRequestData("vnp_Amount", (model.Amount * 100).ToString());
-            _vnpay.AddRequestData("vnp_CreateDate", DateTime.UtcNow.ToString("yyyyMMddHHmmss"));
-            _vnpay.AddRequestData("vnp_ExpireDate", DateTime.UtcNow.AddMinutes(15).ToString("yyyyMMddHHmmss"));
+
+            var vnTimeZoneOffset = new TimeSpan(7, 0, 0); // UTC+7 offset
+            var createDate = new DateTimeOffset(DateTime.UtcNow, TimeSpan.Zero).ToOffset(vnTimeZoneOffset);
+            var expireDate = createDate.AddMinutes(15);
+
+            _vnpay.AddRequestData("vnp_CreateDate", createDate.ToString("yyyyMMddHHmmss"));
+            _vnpay.AddRequestData("vnp_ExpireDate", expireDate.ToString("yyyyMMddHHmmss"));
             _vnpay.AddRequestData("vnp_OrderInfo", model.OrderInfo);
             _vnpay.AddRequestData("vnp_OrderType", model.OrderType);
             _vnpay.AddRequestData("vnp_TxnRef", model.TxnRef.ToString());
