@@ -28,7 +28,7 @@ public class UpdateOrderStatusCommandHandler : ICommandHandler<UpdateOrderStatus
     public async Task<Result> Handle(UpdateOrderStatusCommand request, CancellationToken cancellationToken)
     {
         var order = await _orderRepository.FindAll(x => x.Id == request.OrderId)
-            .Include(x => x.OrderDetails).ThenInclude(x => x.Product)
+            .Include(x => x.OrderDetails)
             .FirstOrDefaultAsync(cancellationToken);
         if (order == null)
         {
@@ -49,7 +49,7 @@ public class UpdateOrderStatusCommandHandler : ICommandHandler<UpdateOrderStatus
                     return Result.Failure(DomainError.CommonError.AlreadyExists(nameof(order.ShippingCode)));
                 }
 
-                var result = await _ghnService.CreateShippingOrder(new CreateGhnShippingOrderModel
+                var result = await _ghnService.CreateShippingOrder(new CreateGhnOrderModel
                 {
                     ToName = order.ReceiverName,
                     ToPhone = order.PhoneNumber,
