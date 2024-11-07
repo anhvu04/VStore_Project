@@ -5,6 +5,7 @@ using Microsoft.IdentityModel.Tokens;
 using VStore.Application.Abstractions.Authentication;
 using VStore.Application.Abstractions.BCrypt;
 using VStore.Application.Abstractions.EmailService;
+using VStore.Application.Abstractions.GhnService;
 using VStore.Application.Abstractions.PayOsService;
 using VStore.Application.Abstractions.VNPayService;
 using VStore.Domain.AuthenticationScheme;
@@ -83,5 +84,6 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<IVnPayService, VnPayService>();
         services.AddSingleton<VnPayLibrary>();
         services.AddSingleton<PayOsLibrary>();
+        services.AddSingleton<IGhnService, GhnService.GhnService>();
     }
 }
