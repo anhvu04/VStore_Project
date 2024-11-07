@@ -2,6 +2,7 @@ using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using VStore.API.Common;
+using VStore.Application.Usecases.Order.Command.CancelOrderCustomer;
 using VStore.Application.Usecases.Order.Query.GetOrder;
 using VStore.Application.Usecases.Order.Query.GetOrders;
 using VStore.Domain.AuthenticationScheme;
@@ -37,6 +38,18 @@ public class CustomerController(ISender sender) : ApiController(sender)
         query.CustomerId = userId;
         var res = await Sender.Send(query);
         return res.IsSuccess ? Ok(res.Value) : BadRequest(res.Error);
+    }
+
+    [HttpPost("orders/{orderId}/cancel")]
+    [Authorize(AuthenticationSchemes = AuthenticationScheme.Access, Roles = nameof(Role.Customer))]
+    [ServiceFilter(typeof(UserExistFilter))]
+    public async Task<IActionResult> CancelOrder(Guid orderId)
+    {
+        var userId = Guid.Parse(HttpContext.User.Claims.FirstOrDefault(c => c.Type == "UserId")?.Value ??
+                                Guid.Empty.ToString());
+        var command = new CancelOrderCustomerCommand { CustomerId = userId, OrderId = orderId };
+        var res = await Sender.Send(command);
+        return res.IsSuccess ? Ok() : BadRequest(res.Error);
     }
 
     #endregion

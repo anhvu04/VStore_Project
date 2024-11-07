@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace VStore.Application.Models.GhnService;
 
-public class CreateGhnShippingOrderModel
+public class CreateGhnOrderModel
 {
     [JsonPropertyName("to_name")] public string ToName { get; set; }
     [JsonPropertyName("to_phone")] public string ToPhone { get; set; }
