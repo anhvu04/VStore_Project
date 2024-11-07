@@ -1,6 +1,6 @@
 namespace VStore.Application.Usecases.Checkout.Common;
 
-public record OrderDetailModel
+public record OrderDetailCheckoutModel
 {
     public Guid ProductId { get; init; }
     public required string ProductName { get; init; }
