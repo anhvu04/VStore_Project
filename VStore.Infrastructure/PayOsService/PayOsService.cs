@@ -42,6 +42,11 @@ public class PayOsService : IPayOsService
         _payOs.confirmWebhook(_configuration["PayOs:WebhookUrl"]!);
     }
 
+    /// <summary>
+    /// Create payment link using payos library
+    /// </summary>
+    /// <param name="model"></param>
+    /// <returns></returns>
     public async Task<ApiResponseModel> CreatePaymentLink(CreatePayOsPaymentModel model)
     {
         try
@@ -65,6 +70,72 @@ public class PayOsService : IPayOsService
         }
     }
 
+
+    /// <summary>
+    /// verify payment webhook type using payos library
+    /// </summary>
+    /// <param name="data"></param>
+    /// <returns></returns>
+    public async Task<Result<PayOsWebHookResponseModel>> VerifyPaymentWebHookType(WebhookTypeModel data)
+    {
+        try
+        {
+            var webHookData = new WebhookData(data.Data.OrderCode, data.Data.Amount, data.Data.Description,
+                data.Data.AccountNumber, data.Data.Reference, data.Data.TransactionDateTime, data.Data.Currency,
+                data.Data.PaymentLinkId, data.Data.Code, data.Data.Desc, data.Data.CounterAccountBankId,
+                data.Data.CounterAccountBankName, data.Data.CounterAccountName, data.Data.CounterAccountNumber,
+                data.Data.VirtualAccountName, data.Data.VirtualAccountNumber);
+            var webHookType = new WebhookType(data.Code, data.Desc, data.Success, webHookData, data.Signature);
+
+            // verify payment webhook data
+            var res = _payOs.verifyPaymentWebhookData(webHookType);
+
+            var serviceProvider = _serviceProvider.CreateScope();
+            var orderRepository = serviceProvider.ServiceProvider.GetRequiredService<IOrderRepository>();
+            var unitOfWork = serviceProvider.ServiceProvider.GetRequiredService<IUnitOfWork>();
+            var order = await orderRepository.FindAll(x => x.TransactionCode == res.orderCode)
+                .FirstOrDefaultAsync(cancellationToken: default);
+
+            if (order == null)
+            {
+                _logger.LogInformation("Order not found");
+                return Result<PayOsWebHookResponseModel>.Success(
+                    new PayOsWebHookResponseModel(false, "Order not found"));
+            }
+
+            _logger.LogInformation("Order {0} is paid", order.TransactionCode);
+            order.Status = OrderStatus.Processing;
+            orderRepository.Update(order);
+            await unitOfWork.SaveChangesAsync(cancellationToken: default);
+            return Result<PayOsWebHookResponseModel>.Success(
+                new PayOsWebHookResponseModel(true, "Success update order"));
+        }
+        catch (Exception)
+        {
+            return Result<PayOsWebHookResponseModel>.Failure(DomainError.PayOs.PayOsWebhookError);
+        }
+    }
+
+    public async Task<Result> CancelPaymentLink(long orderCode)
+    {
+        try
+        {
+            await _payOs.cancelPaymentLink(orderCode);
+            return Result.Success();
+        }
+        catch (Exception)
+        {
+            return Result.Failure(DomainError.PayOs.CancelPaymentLinkError);
+        }
+    }
+
+
+    /// <summary>
+    /// verify payment webhook
+    /// </summary>
+    /// <param name="request"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
     public async Task<Result<PayOsWebHookResponseModel>> VerifyPaymentWebHook(VerifyPayOsWebHookModel request,
         CancellationToken cancellationToken)
     {
@@ -124,6 +195,12 @@ public class PayOsService : IPayOsService
         return Result<PayOsWebHookResponseModel>.Success(new PayOsWebHookResponseModel(true, "Success update order"));
     }
 
+    /// <summary>
+    /// Create signature web hook
+    /// </summary>
+    /// <param name="request"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
     public async Task<Result<PayOsWebHookResponseModel>> CreateSignatureWebHook(CreatePayOsSignatureModel request,
         CancellationToken cancellationToken)
     {
@@ -155,42 +232,8 @@ public class PayOsService : IPayOsService
         return Result<PayOsWebHookResponseModel>.Success(new PayOsWebHookResponseModel(true, data));
     }
 
-    public async Task<Result<PayOsWebHookResponseModel>> VerifyPaymentWebHookType(WebhookTypeModel data)
-    {
-        try
-        {
-            var webHookData = new WebhookData(data.Data.OrderCode, data.Data.Amount, data.Data.Description,
-                data.Data.AccountNumber, data.Data.Reference, data.Data.TransactionDateTime, data.Data.Currency,
-                data.Data.PaymentLinkId, data.Data.Code, data.Data.Desc, data.Data.CounterAccountBankId,
-                data.Data.CounterAccountBankName, data.Data.CounterAccountName, data.Data.CounterAccountNumber,
-                data.Data.VirtualAccountName, data.Data.VirtualAccountNumber);
-            var webHookType = new WebhookType(data.Code, data.Desc, data.Success, webHookData, data.Signature);
-            var res = _payOs.verifyPaymentWebhookData(webHookType);
-            var serviceProvider = _serviceProvider.CreateScope();
-            var orderRepository = serviceProvider.ServiceProvider.GetRequiredService<IOrderRepository>();
-            var unitOfWork = serviceProvider.ServiceProvider.GetRequiredService<IUnitOfWork>();
-            var order = await orderRepository.FindAll(x => x.TransactionCode == res.orderCode)
-                .FirstOrDefaultAsync(cancellationToken: default);
 
-            if (order == null)
-            {
-                _logger.LogInformation("Order not found");
-                return Result<PayOsWebHookResponseModel>.Success(
-                    new PayOsWebHookResponseModel(false, "Order not found"));
-            }
-
-            _logger.LogInformation("Order {0} is paid", order.TransactionCode);
-            order.Status = OrderStatus.Processing;
-            orderRepository.Update(order);
-            await unitOfWork.SaveChangesAsync(cancellationToken: default);
-            return Result<PayOsWebHookResponseModel>.Success(
-                new PayOsWebHookResponseModel(true, "Success update order"));
-        }
-        catch (Exception)
-        {
-            return Result<PayOsWebHookResponseModel>.Failure(DomainError.PayOs.PayOsWebhookError);
-        }
-    }
+    #region Helper Methods
 
     private Task<ApiResponseModel> VerifyPaymentWebHook(VerifyPayOsWebHookModel data)
     {
@@ -245,4 +288,6 @@ public class PayOsService : IPayOsService
         _payOsLibrary.AddResponseData("virtualAccountName", webhookData.VirtualAccountName ?? "");
         _payOsLibrary.AddResponseData("virtualAccountNumber", webhookData.VirtualAccountNumber ?? "");
     }
+
+    #endregion
 }

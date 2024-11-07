@@ -8,6 +8,8 @@ namespace VStore.Application.Abstractions.PayOsService;
 public interface IPayOsService
 {
     Task<ApiResponseModel> CreatePaymentLink(CreatePayOsPaymentModel model);
+    Task<Result<PayOsWebHookResponseModel>> VerifyPaymentWebHookType(WebhookTypeModel data);
+    Task<Result> CancelPaymentLink(long orderCode);
 
     Task<Result<PayOsWebHookResponseModel>> VerifyPaymentWebHook(VerifyPayOsWebHookModel request,
         CancellationToken cancellationToken = default);
@@ -17,6 +19,4 @@ public interface IPayOsService
 
     Task<Result<PayOsWebHookResponseModel>> GetPaymentInformation(long orderCode,
         CancellationToken cancellationToken = default);
-
-    Task<Result<PayOsWebHookResponseModel>> VerifyPaymentWebHookType(WebhookTypeModel data);
 }

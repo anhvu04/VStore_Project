@@ -9,4 +9,5 @@ public interface IVnPayService
 {
     ApiResponseModel CreatePaymentLink(CreateVnPayPaymentModel model);
     Task<VnPayIpnResponse> VerifyIpnPayment(IQueryCollection request);
+    
 }

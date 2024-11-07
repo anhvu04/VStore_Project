@@ -5,11 +5,10 @@ using Microsoft.Extensions.DependencyInjection;
 using VStore.Application.Abstractions.VNPayService;
 using VStore.Application.Models;
 using VStore.Application.Models.VnPayService;
-using VStore.Application.Usecases.Checkout.Common;
 using VStore.Domain.Abstractions;
 using VStore.Domain.Abstractions.Repositories;
 
-namespace VStore.Infrastructure.VNPayService;
+namespace VStore.Infrastructure.VnPayService;
 
 public class VnPayService : IVnPayService
 {
