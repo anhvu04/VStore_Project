@@ -74,7 +74,7 @@ public class GetProductsQueryHandler : IQueryHandler<GetProductsQuery, PageList<
         {
             "name" => product => product.Name,
             "price" => product => product.SalePrice == 0 ? product.OriginalPrice : product.SalePrice,
-            "createddate" => product => product.CreatedDate,
+            "createdDate" => product => product.CreatedDate,
             _ => product => product.Id
         };
 }

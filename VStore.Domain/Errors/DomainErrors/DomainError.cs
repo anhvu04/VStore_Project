@@ -141,4 +141,14 @@ public static class DomainError
         public static readonly Error GetPaymentInfoError =
             new("Error.Checkout.GetPaymentInfoError", "Error when getting payment information.");
     }
+
+    public static class Order
+    {
+        public static readonly Error OrderStatusMustBeIncreased =
+            new("Error.Order.OrderStatusMustBeIncreased",
+                "Order status must be increased. (Pending -> Processing -> Shipping -> Delivered)");
+
+        public static readonly Error GhnServiceError =
+            new("Error.Order.GhnServiceError", "Error when creating Ghn shipping order.");
+    }
 }
