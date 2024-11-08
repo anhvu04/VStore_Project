@@ -4,6 +4,8 @@ using Microsoft.EntityFrameworkCore;
 using VStore.Application.Abstractions.MediatR;
 using VStore.Application.Abstractions.PayOsService;
 using VStore.Application.Abstractions.VNPayService;
+using VStore.Application.Models.PayOsService;
+using VStore.Application.Models.VnPayService;
 using VStore.Application.Usecases.Checkout.Common;
 using VStore.Domain.Abstractions;
 using VStore.Domain.Abstractions.Repositories;
@@ -52,7 +54,7 @@ public class CheckoutCommandHandler : ICommandHandler<CheckoutCommand, CheckoutR
             .Select(x => new
             {
                 CartDetail = x.CartDetails,
-                OrderDetail = x.CartDetails.Select(cd => _mapper.Map<OrderDetailModel>(cd)).ToList(),
+                OrderDetail = x.CartDetails.Select(cd => _mapper.Map<OrderDetailCheckoutModel>(cd)).ToList(),
                 TotalGram = x.CartDetails.Sum(cd => cd.Product.Gram * cd.Quantity),
                 TotalPrice = x.CartDetails.Sum(cd => cd.Product.SalePrice == 0
                     ? cd.Product.OriginalPrice * cd.Quantity
