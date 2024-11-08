@@ -140,5 +140,30 @@ public static class DomainError
 
         public static readonly Error GetPaymentInfoError =
             new("Error.Checkout.GetPaymentInfoError", "Error when getting payment information.");
+
+        public static readonly Error CancelPaymentLinkError =
+            new("Error.Checkout.CancelPaymentLinkError", "Error when canceling payment link.");
+    }
+
+    public static class Order
+    {
+        public static readonly Error OrderStatusMustBeIncreased =
+            new("Error.Order.OrderStatusMustBeIncreased",
+                "Order status must be increased. (Pending -> Processing -> Shipping -> Delivered)");
+
+        public static readonly Error GhnServiceError =
+            new("Error.Order.GhnServiceError", "Error when creating Ghn shipping order.");
+
+        public static readonly Error OrderCannotBeCancelledByAdmin =
+            new("Error.Order.OrderCannotBeCancelledByAdmin",
+                "Order cannot be cancelled by admin. Only pending or processing orders can be cancelled by admin.");
+
+        public static readonly Error VnPayOrderCancelError =
+            new("Error.Order.VnPayOrderCancelError",
+                "Order with Vnpay service cannot be cancelled. Please cancel the payment link instead.");
+
+        public static readonly Error OrderCannotBeCancelledByUser =
+            new("Error.Order.OrderCannotBeCancelledByUser",
+                "Order cannot be cancelled by user. Only pending orders can be cancelled by user.");
     }
 }

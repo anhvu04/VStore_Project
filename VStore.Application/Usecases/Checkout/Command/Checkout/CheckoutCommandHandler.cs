@@ -54,7 +54,7 @@ public class CheckoutCommandHandler : ICommandHandler<CheckoutCommand, CheckoutR
             .Select(x => new
             {
                 CartDetail = x.CartDetails,
-                OrderDetail = x.CartDetails.Select(cd => _mapper.Map<OrderDetailModel>(cd)).ToList(),
+                OrderDetail = x.CartDetails.Select(cd => _mapper.Map<OrderDetailCheckoutModel>(cd)).ToList(),
                 TotalGram = x.CartDetails.Sum(cd => cd.Product.Gram * cd.Quantity),
                 TotalPrice = x.CartDetails.Sum(cd => cd.Product.SalePrice == 0
                     ? cd.Product.OriginalPrice * cd.Quantity
