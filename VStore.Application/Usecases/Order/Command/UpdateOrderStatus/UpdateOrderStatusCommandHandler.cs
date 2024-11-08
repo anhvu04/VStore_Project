@@ -56,6 +56,7 @@ public class UpdateOrderStatusCommandHandler : ICommandHandler<UpdateOrderStatus
                     ToAddress = order.Address,
                     ToWardCode = order.WardCode,
                     ToDistrictId = order.DistrictId,
+                    CodAmount = order.PaymentMethod == PaymentMethod.Cod ? order.TotalPrice : 0,
                     Weight = order.TotalGram,
                     PaymentTypeId = order.PaymentMethod == PaymentMethod.Cod ? 2 : 1,
                     Note = order.Note,

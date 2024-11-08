@@ -3,10 +3,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using VStore.API.Common;
 using VStore.Application.Abstractions.GhnService;
-using VStore.Application.Models.GhnService;
-using VStore.Application.Usecases.GHNExpress.Query.GetDistrict;
-using VStore.Application.Usecases.GHNExpress.Query.GetProvince;
-using VStore.Application.Usecases.GHNExpress.Query.GetWard;
 using VStore.Domain.AuthenticationScheme;
 using VStore.Domain.Enums;
 
@@ -21,24 +17,21 @@ public class GhnController(ISender sender, IGhnService ghnService) : ApiControll
     [HttpGet("province")]
     public async Task<IActionResult> GetProvince()
     {
-        var query = new GetProvinceQuery();
-        var result = await Sender.Send(query);
+        var result = await _ghnService.GetProvince();
         return result.IsSuccess ? Ok(result.Value) : BadRequest(result.Error);
     }
 
     [HttpGet("district/{provinceId}")]
     public async Task<IActionResult> GetDistrict(int provinceId)
     {
-        var query = new GetDistrictQuery(provinceId);
-        var result = await Sender.Send(query);
+        var result = await _ghnService.GetDistrict(provinceId);
         return result.IsSuccess ? Ok(result.Value) : BadRequest(result.Error);
     }
 
     [HttpGet("ward/{districtId}")]
     public async Task<IActionResult> GetWard(int districtId)
     {
-        var query = new GetWardQuery(districtId);
-        var result = await Sender.Send(query);
+        var result = await _ghnService.GetWard(districtId);
         return result.IsSuccess ? Ok(result.Value) : BadRequest(result.Error);
     }
 

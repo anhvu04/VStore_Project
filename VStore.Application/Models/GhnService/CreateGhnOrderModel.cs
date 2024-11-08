@@ -9,6 +9,7 @@ public class CreateGhnOrderModel
     [JsonPropertyName("to_address")] public string ToAddress { get; set; }
     [JsonPropertyName("to_ward_code")] public string ToWardCode { get; set; }
     [JsonPropertyName("to_district_id")] public int ToDistrictId { get; set; }
+    [JsonPropertyName("cod_amount")] public int CodAmount { get; set; }
     [JsonPropertyName("weight")] public int Weight { get; set; }
     [JsonPropertyName("length")] public int Length { get; set; } = 50; // default 50cm
     [JsonPropertyName("width")] public int Width { get; set; } = 50; // default 50cm

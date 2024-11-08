@@ -1,7 +1,5 @@
-using System.ComponentModel;
 using System.Linq.Expressions;
 using System.Text.Json;
-using System.Text.Json.Serialization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -10,7 +8,7 @@ using VStore.Application.Abstractions.GhnService;
 using VStore.Application.CoreHelper;
 using VStore.Application.Models;
 using VStore.Application.Models.GhnService;
-using VStore.Domain.Abstractions;
+using VStore.Application.Usecases.GHNExpress.Common;
 using VStore.Domain.Abstractions.Repositories;
 using VStore.Domain.Entities;
 using VStore.Domain.Errors.DomainErrors;
@@ -25,15 +23,6 @@ public class GhnService : IGhnService
     private readonly string _shopId;
     private readonly IServiceProvider _serviceProvider;
 
-    private const string CreateOrderUrl =
-        "https://dev-online-gateway.ghn.vn/shiip/public-api/v2/shipping-order/create";
-
-    private const string GetOrderUrl =
-        "https://dev-online-gateway.ghn.vn/shiip/public-api/v2/shipping-order/detail";
-
-    private const string GetShippingFeeUrl =
-        "https://dev-online-gateway.ghn.vn/shiip/public-api/v2/shipping-order/fee";
-
     public GhnService(IApiService apiService, IConfiguration configuration, IServiceProvider serviceProvider)
     {
         _apiService = apiService;
@@ -44,7 +33,7 @@ public class GhnService : IGhnService
 
     public async Task<ApiResponseModel> CreateShippingOrder(CreateGhnOrderModel model)
     {
-        var result = await _apiService.PostAsync(CreateOrderUrl, model, headers =>
+        var result = await _apiService.PostAsync(UrlHelper.CreateOrderUrl, model, headers =>
         {
             headers.Add("Token", _token);
             headers.Add("ShopId", _shopId);
@@ -98,7 +87,7 @@ public class GhnService : IGhnService
         {
             ShippingCode = shippingCode
         };
-        var result = await _apiService.PostAsync(url: GetOrderUrl, data: orderCode,
+        var result = await _apiService.PostAsync(url: UrlHelper.GetOrderUrl, data: orderCode,
             headers =>
             {
                 headers.Add("Token", _token);
@@ -153,7 +142,7 @@ public class GhnService : IGhnService
             ToDistrictId = customerAddress.DistrictId,
             Weight = cart.CartDetails.Sum(x => x.Product.Gram),
         };
-        var result = await _apiService.PostAsync(url: GetShippingFeeUrl, data: model,
+        var result = await _apiService.PostAsync(url: UrlHelper.GetShippingFeeUrl, data: model,
             headers =>
             {
                 headers.Add("Token", _token);
@@ -181,5 +170,95 @@ public class GhnService : IGhnService
             IsSuccess = true,
             Data = response
         });
+    }
+
+    public async Task<Result<List<GetProvinceModel>>> GetProvince()
+    {
+        try
+        {
+            var result = await _apiService.GetAsync(UrlHelper.GetProvinceUrl, h => h.Add("Token", _token));
+            if (!result.IsSuccess)
+            {
+                return Result<List<GetProvinceModel>>.Failure(DomainError.ApiService.ApiCallFail);
+            }
+
+            var response = JsonSerializer.Deserialize<ApiResponseModel>(result.Value!);
+            if (response == null)
+            {
+                throw new Exception("Invalid response from GHN Express API.");
+            }
+
+            var data = JsonSerializer.Deserialize<List<GetProvinceModel>>(response.Data!.ToString()!);
+            if (data == null)
+            {
+                throw new Exception("Invalid data from GHN Express API.");
+            }
+
+            return Result<List<GetProvinceModel>>.Success(data);
+        }
+        catch (Exception e)
+        {
+            return Result<List<GetProvinceModel>>.Failure(DomainError.ApiService.DeserializeFail(e.Message));
+        }
+    }
+
+    public async Task<Result<List<GetDistrictModel>>> GetDistrict(int provinceId)
+    {
+        try
+        {
+            var result = await _apiService.GetAsync(UrlHelper.GetDistrictUrl + provinceId, h => h.Add("Token", _token));
+            if (!result.IsSuccess)
+            {
+                return Result<List<GetDistrictModel>>.Failure(DomainError.ApiService.ApiCallFail);
+            }
+
+            var response = JsonSerializer.Deserialize<ApiResponseModel>(result.Value!);
+            if (response == null)
+            {
+                throw new Exception("Invalid response from GHN Express API.");
+            }
+
+            var data = JsonSerializer.Deserialize<List<GetDistrictModel>>(response.Data!.ToString()!);
+            if (data == null)
+            {
+                throw new Exception("Invalid data from GHN Express API.");
+            }
+
+            return Result<List<GetDistrictModel>>.Success(data);
+        }
+        catch (Exception e)
+        {
+            return Result<List<GetDistrictModel>>.Failure(DomainError.ApiService.DeserializeFail(e.Message));
+        }
+    }
+
+    public async Task<Result<List<GetWardModel>>> GetWard(int districtId)
+    {
+        try
+        {
+            var result = await _apiService.GetAsync(UrlHelper.GetWardUrl + districtId, h => h.Add("Token", _token));
+            if (!result.IsSuccess)
+            {
+                return Result<List<GetWardModel>>.Failure(DomainError.ApiService.ApiCallFail);
+            }
+
+            var response = JsonSerializer.Deserialize<ApiResponseModel>(result.Value!);
+            if (response == null)
+            {
+                throw new Exception("Invalid response from GHN Express API.");
+            }
+
+            var data = JsonSerializer.Deserialize<List<GetWardModel>>(response.Data!.ToString()!);
+            if (data == null)
+            {
+                throw new Exception("Invalid data from GHN Express API.");
+            }
+
+            return Result<List<GetWardModel>>.Success(data);
+        }
+        catch (Exception e)
+        {
+            return Result<List<GetWardModel>>.Failure(DomainError.ApiService.DeserializeFail(e.Message));
+        }
     }
 }
