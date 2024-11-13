@@ -14,7 +14,7 @@ using VStore.Domain.Entities;
 using VStore.Domain.Errors.DomainErrors;
 using VStore.Domain.Shared;
 
-namespace VStore.Infrastructure.GhnService;
+namespace VStore.Infrastructure.Ghn;
 
 public class GhnService : IGhnService
 {

@@ -2,12 +2,11 @@ using System.Net;
 using System.Net.Mail;
 using Microsoft.Extensions.Options;
 using VStore.Application.Abstractions.EmailService;
-using VStore.Application.Models;
 using VStore.Application.Models.EmailService;
 using VStore.Domain.Shared;
-using VStore.Infrastructure.DependencyInjection.Options;
+using VStore.Infrastructure.DependencyInjection.Options.EmailSettings;
 
-namespace VStore.Infrastructure.EmailService;
+namespace VStore.Infrastructure.Email;
 
 public class EmailService : IEmailService
 {
@@ -20,7 +19,7 @@ public class EmailService : IEmailService
         _emailSettings = emailSettings.CurrentValue;
     }
 
-    public async Task<Result> SendEmailAsync(SendMailModel model, bool isBodyHtml = false,
+    public async Task<Result> SendEmailAsync(SendMailModel model,
         CancellationToken cancellationToken = default)
     {
         var from = _emailSettings.FromEmailAddress;
@@ -31,8 +30,9 @@ public class EmailService : IEmailService
             To = { model.To },
             Subject = model.Subject,
             Body = model.Body,
-            IsBodyHtml = isBodyHtml
+            IsBodyHtml = model.IsBodyHtml
         };
+
         var smtp = new SmtpClient
         {
             Host = _emailSettings.Smtp.Host,
@@ -44,15 +44,16 @@ public class EmailService : IEmailService
         return Result.Success();
     }
 
-    public async Task SendActivationEmailAsync(string to, string token, bool isVerify,
+    public async Task SendActivationEmailAsync(string to, string token, bool isVerify, bool isBodyHtml,
         CancellationToken cancellationToken = default)
     {
         var model = new SendMailModel
         {
             To = to,
             Subject = isVerify ? "Verify your email" : "Reset your password",
-            Body = isVerify ? VerifyLink + token : ResetPasswordLink + token
+            Body = isVerify ? VerifyLink + token : ResetPasswordLink + token,
+            IsBodyHtml = isBodyHtml
         };
-        await SendEmailAsync(model, false, cancellationToken);
+        await SendEmailAsync(model, cancellationToken);
     }
 }

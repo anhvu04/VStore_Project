@@ -1,4 +1,4 @@
-namespace VStore.Infrastructure.DependencyInjection.Options;
+namespace VStore.Infrastructure.DependencyInjection.Options.EmailSettings;
 
 public class EmailSettings
 {

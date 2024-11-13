@@ -2,8 +2,9 @@ using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using VStore.Application.Abstractions.Authentication;
 using VStore.Application.Abstractions.BCrypt;
-using VStore.Application.Abstractions.EmailService;
 using VStore.Application.Abstractions.MediatR;
+using VStore.Application.Abstractions.RabbitMqService.Producer;
+using VStore.Application.Models.EmailService;
 using VStore.Domain.Abstractions;
 using VStore.Domain.Abstractions.Repositories;
 using VStore.Domain.Entities;
@@ -20,20 +21,20 @@ public class RegisterCommandHandler : ICommandHandler<RegisterCommand>
     private readonly IUnitOfWork _unitOfWork;
     private readonly IJwtTokenGenerator _jwtTokenGenerator;
     private readonly IPasswordHasher _passwordHasher;
-    private readonly IEmailService _emailService;
     private readonly IMapper _mapper;
+    private readonly IEmailProducerService _emailProducerService;
 
     public RegisterCommandHandler(IUserRepository userRepository, IUnitOfWork unitOfWork,
         ICustomerRepository customerRepository, IJwtTokenGenerator jwtTokenGenerator, IPasswordHasher passwordHasher,
-        IEmailService emailService, IMapper mapper)
+        IMapper mapper, IEmailProducerService emailProducerService)
     {
         _userRepository = userRepository;
         _unitOfWork = unitOfWork;
         _customerRepository = customerRepository;
         _jwtTokenGenerator = jwtTokenGenerator;
         _passwordHasher = passwordHasher;
-        _emailService = emailService;
         _mapper = mapper;
+        _emailProducerService = emailProducerService;
     }
 
     public async Task<Result> Handle(RegisterCommand request, CancellationToken cancellationToken)
@@ -80,7 +81,20 @@ public class RegisterCommandHandler : ICommandHandler<RegisterCommand>
 
         //send verify email
         var token = await _jwtTokenGenerator.GenerateToken(userEntity, TokenType.Verification);
-        await _emailService.SendActivationEmailAsync(request.Email, token, true, cancellationToken);
+        _emailProducerService.SendMessage(GetVerifyEmailModel(customer.Email, token));
         return Result.Success();
+    }
+
+    private SendMailModel GetVerifyEmailModel(string customerEmail, string token)
+    {
+        var model = new SendMailModel
+        {
+            To = customerEmail,
+            Subject = "Verify Email",
+            Body =
+                $"Please click the link below to verify your email address: <a href='https://localhost:5000/verify?token={token}'>Verify Email</a>",
+            IsBodyHtml = true
+        };
+        return model;
     }
 }
