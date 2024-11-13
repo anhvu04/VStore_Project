@@ -9,7 +9,6 @@ using VStore.Application.Abstractions.ApiService;
 using VStore.Application.Abstractions.PayOsService;
 using VStore.Application.Models;
 using VStore.Application.Models.PayOsService;
-using VStore.Application.Usecases.Checkout.Common;
 using VStore.Domain.Abstractions;
 using VStore.Domain.Abstractions.Repositories;
 using VStore.Domain.Enums;
@@ -17,7 +16,7 @@ using VStore.Domain.Errors.DomainErrors;
 using VStore.Domain.Shared;
 using ItemData = Net.payOS.Types.ItemData;
 
-namespace VStore.Infrastructure.PayOsService;
+namespace VStore.Infrastructure.PayOs;
 
 public class PayOsService : IPayOsService
 {

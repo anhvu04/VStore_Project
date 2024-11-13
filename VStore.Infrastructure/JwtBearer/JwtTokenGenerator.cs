@@ -10,7 +10,7 @@ using VStore.Domain.Enums;
 using VStore.Domain.Errors.DomainErrors;
 using VStore.Domain.Shared;
 
-namespace VStore.Infrastructure.JwtBearerService;
+namespace VStore.Infrastructure.JwtBearer;
 
 public class JwtTokenGenerator : IJwtTokenGenerator
 {
