@@ -15,8 +15,8 @@ public class EmailProducerService : IEmailProducerService
     public EmailProducerService(RabbitMqService rabbitMqService,
         ILogger<EmailProducerService> logger, IOptionsMonitor<QueueSettings> options)
     {
-        _queueSettings = options.CurrentValue;
-        _channel = rabbitMqService.CreateChannel(true).Result;
+        _queueSettings = options.Get(QueueSettings.EmailSection);
+        _channel = rabbitMqService.CreateChannel(true, "Email").Result;
         _logger = logger;
     }
 

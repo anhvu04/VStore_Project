@@ -21,8 +21,8 @@ public class EmailConsumerService : IEmailConsumerService
     {
         _logger = logger;
         _emailService = emailService;
-        _queueSettings = options.CurrentValue;
-        _channel = rabbitMqService.CreateChannel(false).Result;
+        _queueSettings = options.Get(QueueSettings.EmailSection);
+        _channel = rabbitMqService.CreateChannel(false, "Email").Result;
         _channel.ExchangeDeclareAsync(_queueSettings.ExchangeName, ExchangeType.Direct);
         _channel.QueueDeclareAsync(_queueSettings.QueueName, true, false, false);
         _channel.QueueBindAsync(_queueSettings.QueueName, _queueSettings.ExchangeName, _queueSettings.RoutingKey);

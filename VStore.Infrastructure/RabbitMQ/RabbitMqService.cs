@@ -63,11 +63,12 @@ public class RabbitMqService : IDisposable
         }
     }
 
-    public async Task<IChannel> CreateChannel(bool isProducer)
+    public async Task<IChannel> CreateChannel(bool isProducer, string type)
     {
         try
         {
-            _logger.LogInformation("Creating RabbitMQ Channel" + (isProducer ? " for Producer" : " for Consumer"));
+            _logger.LogInformation("Creating RabbitMQ Channel" +
+                                   (isProducer ? " for Producer " + type : " for Consumer " + type));
             return await _connection.CreateChannelAsync();
         }
         catch (Exception ex)
