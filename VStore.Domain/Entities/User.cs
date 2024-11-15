@@ -1,12 +1,11 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using VStore.Domain.Abstractions;
-using VStore.Domain.Abstractions.Entities;
 using VStore.Domain.Enums;
 
 namespace VStore.Domain.Entities;
 
-public class User : EntityBase<Guid>, IDateTracking, ISoftDelete
+public class User : EntityDateAndDeleteBase<Guid>
 {
     [Required] [Range(5, 20)] public string UserName { get; set; } = null!;
     [Required] public string Password { get; set; } = null!;
@@ -22,6 +21,9 @@ public class User : EntityBase<Guid>, IDateTracking, ISoftDelete
     public DateTime? DeletedDate { get; set; }
     public Role Role { get; set; }
     public Sex Sex { get; set; }
+    public virtual Connection? Connection { get; set; }
     public virtual Customer? Customer { get; set; }
     public virtual ICollection<RefreshToken> RefreshTokens { get; set; } = [];
+    public virtual ICollection<Message> MessagesSent { get; set; } = [];
+    public virtual ICollection<Message> MessagesReceived { get; set; } = [];
 }
