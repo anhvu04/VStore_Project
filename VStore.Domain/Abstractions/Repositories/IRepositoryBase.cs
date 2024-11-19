@@ -27,4 +27,5 @@ public interface IRepositoryBase<TEntity, in TKey> where TEntity : EntityBase<TK
     void Remove(TEntity entity);
     void AddRange(IEnumerable<TEntity> entities);
     void RemoveRange(IEnumerable<TEntity> entities);
+    void UpdateRange(IEnumerable<TEntity> entities);
 }

@@ -94,4 +94,9 @@ public abstract class RepositoryBase<TEntity, TKey> : IRepositoryBase<TEntity, T
     {
         _context.Set<TEntity>().RemoveRange(entities);
     }
+
+    public void UpdateRange(IEnumerable<TEntity> entities)
+    {
+        _context.Set<TEntity>().UpdateRange(entities);
+    }
 }
