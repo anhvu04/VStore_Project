@@ -1,5 +1,7 @@
 using Serilog;
 using VStore.API.DependencyInjection;
+using VStore.Infrastructure.SignalR.MessageHub;
+using VStore.Infrastructure.SignalR.PresenceHub;
 
 namespace VStore.API;
 
@@ -30,7 +32,8 @@ public class Program
 
         app.UseSwagger();
         app.UseSwaggerUI();
-
+        app.MapHub<MessageHub>("/hubs/message");
+        app.MapHub<PresenceHub>("hubs/presence");
         app.UseHttpsRedirection();
         app.UseAuthentication();
         app.UseAuthorization();

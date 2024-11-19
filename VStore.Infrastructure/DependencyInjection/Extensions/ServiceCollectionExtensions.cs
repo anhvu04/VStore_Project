@@ -1,4 +1,5 @@
 using System.Text;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
@@ -16,7 +17,6 @@ using VStore.Application.Abstractions.RabbitMqService.Producer;
 using VStore.Application.Abstractions.VNPayService;
 using VStore.Domain.AuthenticationScheme;
 using VStore.Infrastructure.BCrypt;
-using VStore.Infrastructure.DependencyInjection.Options;
 using VStore.Infrastructure.DependencyInjection.Options.EmailSettings;
 using VStore.Infrastructure.DependencyInjection.Options.RabbitMqSettings;
 using VStore.Infrastructure.Email;
@@ -27,6 +27,7 @@ using VStore.Infrastructure.Quartz;
 using VStore.Infrastructure.RabbitMQ;
 using VStore.Infrastructure.RabbitMQ.EmailService;
 using VStore.Infrastructure.RabbitMQ.PayOsService;
+using VStore.Infrastructure.SignalR.PresenceHub;
 using VStore.Infrastructure.VnPayService;
 
 namespace VStore.Infrastructure.DependencyInjection.Extensions;
@@ -39,6 +40,7 @@ public static class ServiceCollectionExtensions
         services.AddEmailService(configuration);
         services.AddRabbitMqService(configuration);
         services.AddQuartzService(configuration);
+        services.AddSignalRService();
         services.AddDependencies();
         services.AddHostedService<HostedService.AppHostedService>();
     }
@@ -64,6 +66,20 @@ public static class ServiceCollectionExtensions
                             ),
                             ClockSkew = TimeSpan.FromMinutes(0)
                         };
+                    o.Events = new JwtBearerEvents
+                    {
+                        OnMessageReceived = context =>
+                        {
+                            var accessToken = context.Request.Query["access_token"];
+                            var path = context.HttpContext.Request.Path;
+                            if (!string.IsNullOrEmpty(accessToken) && path.StartsWithSegments("/hubs"))
+                            {
+                                context.Token = accessToken;
+                            }
+
+                            return Task.CompletedTask;
+                        }
+                    };
                 }
             ).AddJwtBearer(
                 AuthenticationScheme.Refresh,
@@ -119,6 +135,12 @@ public static class ServiceCollectionExtensions
                 return scheduler;
             });
         services.AddSingleton<IQuartzService, QuartzService>();
+    }
+
+    private static void AddSignalRService(this IServiceCollection services)
+    {
+        services.AddSignalR();
+        services.AddSingleton<PresenceTracker>();
     }
 
     private static void AddDependencies(this IServiceCollection services)

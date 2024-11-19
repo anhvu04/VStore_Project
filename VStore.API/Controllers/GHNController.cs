@@ -42,7 +42,7 @@ public class GhnController(ISender sender, IGhnService ghnService) : ApiControll
     public async Task<IActionResult> GetGhnOrderInfo(string shippingCode)
     {
         var role = HttpContext.User.Claims
-            .FirstOrDefault(c => c.Type == "http://schemas.microsoft.com/ws/2008/06/identity/claims/role")?.Value;
+            .FirstOrDefault(c => c.Type == System.Security.Claims.ClaimTypes.Role)?.Value;
         Guid userId = Guid.Empty;
         if (role == nameof(Role.Customer))
         {
