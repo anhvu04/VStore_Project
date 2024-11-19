@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using VStore.Persistence;
 
@@ -11,9 +12,11 @@ using VStore.Persistence;
 namespace VStore.Persistence.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241115083509_Change Message key to Guid")]
+    partial class ChangeMessagekeytoGuid
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -310,11 +313,19 @@ namespace VStore.Persistence.Migrations
                     b.Property<Guid>("RecipientId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<string>("RecipientName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<bool>("SenderDeleted")
                         .HasColumnType("bit");
 
                     b.Property<Guid>("SenderId")
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("SenderName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 

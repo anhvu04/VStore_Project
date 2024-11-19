@@ -2,6 +2,8 @@ using Microsoft.EntityFrameworkCore;
 using VStore.Application.Abstractions.Authentication;
 using VStore.Application.Abstractions.EmailService;
 using VStore.Application.Abstractions.MediatR;
+using VStore.Application.Abstractions.RabbitMqService.Producer;
+using VStore.Application.Models.EmailService;
 using VStore.Domain.Abstractions;
 using VStore.Domain.Abstractions.Repositories;
 using VStore.Domain.Entities;
@@ -15,18 +17,19 @@ public class ForgotPasswordCommandHandler : ICommandHandler<ForgotPasswordComman
 {
     private readonly IUserRepository _userRepository;
     private readonly ICustomerRepository _customerRepository;
-    private readonly IEmailService _emailService;
     private readonly IJwtTokenGenerator _jwtTokenGenerator;
     private readonly IUnitOfWork _unitOfWork;
+    private readonly IEmailProducerService _emailProducerService;
 
     public ForgotPasswordCommandHandler(ICustomerRepository customerRepository, IEmailService emailService,
-        IJwtTokenGenerator jwtTokenGenerator, IUserRepository userRepository, IUnitOfWork unitOfWork)
+        IJwtTokenGenerator jwtTokenGenerator, IUserRepository userRepository, IUnitOfWork unitOfWork,
+            IEmailProducerService emailProducerService)
     {
         _customerRepository = customerRepository;
-        _emailService = emailService;
         _jwtTokenGenerator = jwtTokenGenerator;
         _userRepository = userRepository;
         _unitOfWork = unitOfWork;
+        _emailProducerService = emailProducerService;
     }
 
     public async Task<Result> Handle(ForgotPasswordCommand request, CancellationToken cancellationToken)
@@ -49,7 +52,20 @@ public class ForgotPasswordCommandHandler : ICommandHandler<ForgotPasswordComman
         _userRepository.Update(customer.User);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
         var token = await _jwtTokenGenerator.GenerateToken(customer.User, TokenType.ResetPassword);
-        await _emailService.SendActivationEmailAsync(customer.Email, token, false, cancellationToken);
+        _emailProducerService.SendMessage(GetForgetPasswordEmailModel(customer.Email, token));
         return Result.Success();
+    }
+
+    private SendMailModel GetForgetPasswordEmailModel(string customerEmail, string token)
+    {
+        var model = new SendMailModel
+        {
+            To = customerEmail,
+            Subject = "Reset Password",
+            Body =
+                $"Please click the link below to reset your password: <a href='https://localhost:5000/reset-password?token={token}'>Reset Password</a>",
+            IsBodyHtml = false
+        };
+        return model;
     }
 }

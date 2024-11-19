@@ -1,9 +1,8 @@
 using System.Globalization;
-using System.Net;
 using System.Security.Cryptography;
 using System.Text;
 
-namespace VStore.Infrastructure.PayOsService;
+namespace VStore.Infrastructure.PayOs;
 
 public class PayOsLibrary
 {
