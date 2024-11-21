@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -23,11 +24,40 @@ public static class ServiceCollectionExtensions
         {
             // Azure Connection String
             // var connectionString = configuration["AzureConnectionStrings:DefaultConnection"];
-            var connectionString = configuration.GetConnectionString("DefaultConnection");
+            var env = configuration["ASPNETCORE_ENVIRONMENT"] ?? "Development";
+            string connectionString = "";
+            if (env == "Development")
+            {
+                connectionString = configuration.GetConnectionString("DefaultConnection")!;
+            }
+            else
+            {
+                var server = configuration["SERVER"] ?? "PANHVU04\\SQLEXPRESS";
+                var port = configuration["PORT"] ?? "1433";
+                var database = configuration["DATABASE"] ?? "VStoreDB";
+                var user = configuration["USER"] ?? "sa";
+                var password = configuration["PASSWORD"] ?? "12345";
+                connectionString =
+                    $"Server={server},{port};Database={database};Persist Security Info=True;User ID={user};Password={password};Pooling=False;Multiple Active Result Sets=True;Encrypt=True;Trust Server Certificate=True";
+            }
+
+            Console.WriteLine($"Connection String: {connectionString}");
+            // var connectionString = configuration.GetConnectionString("DefaultConnection");
             builder.EnableDetailedErrors()
                 .UseLazyLoadingProxies()
-                .UseSqlServer(connectionString);
+                .UseSqlServer(connectionString, opt => { opt.CommandTimeout(120); });
         });
+    }
+
+    /// <summary>
+    /// Auto migrate database (create if not exist, update if exist)
+    /// </summary>
+    /// <param name="app"></param>
+    public static void ApplyMigrations(this IApplicationBuilder app)
+    {
+        using var scope = app.ApplicationServices.CreateScope();
+        var dbContext = scope.ServiceProvider.GetRequiredService<DbContext>();
+        dbContext.Database.Migrate();
     }
 
     private static void AddDependencies(this IServiceCollection services)

@@ -1,0 +1,48 @@
+services:
+  # database service
+  mssql:
+    container_name: vstore-db
+    image: mcr.microsoft.com/mssql/server:2019-CU20-ubuntu-18.04
+    restart: always
+    env_file:
+      - .env
+    environment:
+      - ACCEPT_EULA='Y'
+      - MSSQL_SA_PASSWORD=${MSSQL_SA_PASSWORD}
+    ports:
+      - "1434:1433"
+    networks:
+      - vstore-network
+  
+  # rabbitmq service
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"   # RabbitMQ message broker port
+      - "15672:15672" # RabbitMQ management UI port
+    env_file:
+      - .env
+    networks:
+      - vstore-network
+  
+  # api service
+  vstore.api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    env_file:
+      - .env
+    ports:
+      - "8778:8080"
+    depends_on:
+      mssql:
+        condition: service_started
+      rabbitmq:
+        condition: service_started
+    networks:
+      - vstore-network
+networks:
+  vstore-network:
+    driver: bridge
