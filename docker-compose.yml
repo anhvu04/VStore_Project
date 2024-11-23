@@ -13,8 +13,9 @@ services:
       - "1434:1433"
     networks:
       - vstore-network
-  
-  # rabbitmq service
+    volumes:
+      - sql-data:/var/opt/mssql
+      # rabbitmq service
   rabbitmq:
     image: rabbitmq:3-management
     container_name: rabbitmq
@@ -43,6 +44,15 @@ services:
         condition: service_started
     networks:
       - vstore-network
+    volumes:
+      - ./vstore.api/logs:/app/logs
+
 networks:
   vstore-network:
     driver: bridge
+volumes:
+  vstore.api:
+  sql-data:
+  
+      
+  

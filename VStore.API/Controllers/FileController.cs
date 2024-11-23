@@ -8,7 +8,7 @@ namespace VStore.API.Controllers;
 [Route("api")]
 public class FileController(ISender sender) : ApiController(sender)
 {
-    private static readonly string BasePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot");
+    private static readonly string BasePath = Directory.GetCurrentDirectory();
 
     [HttpGet]
     [Route("files/{filePath}")]
