@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -7,6 +8,7 @@ using VStore.Application.Models;
 using VStore.Application.Models.VnPayService;
 using VStore.Domain.Abstractions;
 using VStore.Domain.Abstractions.Repositories;
+using VStore.Infrastructure.SignalR.PresenceHub;
 
 namespace VStore.Infrastructure.VnPayService;
 
@@ -15,12 +17,17 @@ public class VnPayService : IVnPayService
     private readonly VnPayLibrary _vnpay;
     private readonly IConfiguration _configuration;
     private readonly IServiceProvider _serviceProvider;
+    private readonly PresenceTracker _presenceTracker;
+    private readonly IHubContext<PresenceHub> _presenceHub;
 
-    public VnPayService(IConfiguration configuration, VnPayLibrary vnpay, IServiceProvider serviceProvider)
+    public VnPayService(IConfiguration configuration, VnPayLibrary vnpay, IServiceProvider serviceProvider,
+        PresenceTracker presenceTracker, IHubContext<PresenceHub> presenceHub)
     {
         _configuration = configuration;
         _vnpay = vnpay;
         _serviceProvider = serviceProvider;
+        _presenceTracker = presenceTracker;
+        _presenceHub = presenceHub;
         _vnpay.AddRequestData("vnp_TmnCode", _configuration["VnPay:TmnCode"]!);
         _vnpay.AddRequestData("vnp_Version", _configuration["VnPay:Version"]!);
         _vnpay.AddRequestData("vnp_Command", _configuration["VnPay:Command"]!);
@@ -148,6 +155,14 @@ public class VnPayService : IVnPayService
 
             orderRepository.Update(order);
             await unitOfWork.SaveChangesAsync(true, true);
+
+            // Add SignalR notification
+            var connectionId = await _presenceTracker.GetConnectionsForUser(order.CustomerId);
+            if (connectionId != null)
+            {
+                await _presenceHub.Clients.Clients(connectionId).SendAsync("OrderUpdated", order.Status);
+            }
+
             return new VnPayIpnResponse
             {
                 RspCode = "00", // success

@@ -28,7 +28,7 @@ public class QuartzService : IQuartzService
             .ForJob(job)
             .StartNow()
             .WithSimpleSchedule(x => x
-                .WithIntervalInSeconds(60)
+                .WithIntervalInSeconds(60) // check every 60 seconds
                 .RepeatForever())
             .Build();
         await _scheduler.ScheduleJob(job, trigger, cancellationToken);

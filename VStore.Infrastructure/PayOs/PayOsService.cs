@@ -1,4 +1,5 @@
 using System.Text.Json;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -14,6 +15,7 @@ using VStore.Domain.Abstractions.Repositories;
 using VStore.Domain.Enums;
 using VStore.Domain.Errors.DomainErrors;
 using VStore.Domain.Shared;
+using VStore.Infrastructure.SignalR.PresenceHub;
 using ItemData = Net.payOS.Types.ItemData;
 
 namespace VStore.Infrastructure.PayOs;
@@ -27,15 +29,20 @@ public class PayOsService : IPayOsService
     private readonly IServiceProvider _serviceProvider;
     private readonly IApiService _apiService;
     private const string PaymentInformationUrl = "https://api-merchant.payos.vn/v2/payment-requests/";
+    private readonly PresenceTracker _presenceTracker;
+    private readonly IHubContext<PresenceHub> _presenceHub;
 
     public PayOsService(IConfiguration configuration, PayOsLibrary payOsLibrary, ILogger<PayOsService> logger,
-        IServiceProvider serviceProvider, IApiService apiService)
+        IServiceProvider serviceProvider, IApiService apiService, PresenceTracker presenceTracker,
+        IHubContext<PresenceHub> presenceHub)
     {
         _configuration = configuration;
         _payOsLibrary = payOsLibrary;
         _logger = logger;
         _serviceProvider = serviceProvider;
         _apiService = apiService;
+        _presenceTracker = presenceTracker;
+        _presenceHub = presenceHub;
         _payOs = new PayOS(_configuration["PayOs:ClientId"]!, _configuration["PayOs:ApiKey"]!,
             _configuration["PayOs:ChecksumKey"]!);
         _payOs.confirmWebhook(_configuration["PayOs:WebhookUrl"]!);
@@ -106,6 +113,14 @@ public class PayOsService : IPayOsService
             order.Status = OrderStatus.Processing;
             orderRepository.Update(order);
             await unitOfWork.SaveChangesAsync(cancellationToken: default);
+
+            // Add SignalR notification
+            var connectionId = await _presenceTracker.GetConnectionsForUser(order.CustomerId);
+            if (connectionId != null)
+            {
+                await _presenceHub.Clients.Clients(connectionId).SendAsync("OrderUpdated", order.Status);
+            }
+
             return Result<PayOsWebHookResponseModel>.Success(
                 new PayOsWebHookResponseModel(true, "Success update order"));
         }
