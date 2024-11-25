@@ -1,5 +1,6 @@
 using Microsoft.OpenApi.Models;
 using VStore.API.Common;
+using VStore.API.Middleware;
 using VStore.Application.DependencyInjection.Extensions;
 using VStore.Infrastructure.DependencyInjection.Extensions;
 using VStore.Persistence.DependencyInjection.Extensions;
@@ -15,6 +16,7 @@ public static class DependencyInjection
         services.AddInfrastructure(configuration);
         services.AddSwagger();
         services.AddFilter();
+        services.AddMiddleware();
     }
 
     private static void AddSwagger(this IServiceCollection services)
@@ -54,5 +56,10 @@ public static class DependencyInjection
     private static void AddFilter(this IServiceCollection services)
     {
         services.AddScoped<UserExistFilter>();
+    }
+
+    private static void AddMiddleware(this IServiceCollection services)
+    {
+        services.AddExceptionHandler<GlobalExceptionHandler>();
     }
 }

@@ -1,4 +1,5 @@
 using System.Text;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -12,6 +13,7 @@ using VStore.Domain.Abstractions;
 using VStore.Domain.Abstractions.Repositories;
 using VStore.Domain.Enums;
 using VStore.Infrastructure.DependencyInjection.Options.RabbitMqSettings;
+using VStore.Infrastructure.SignalR.PresenceHub;
 using JsonSerializer = System.Text.Json.JsonSerializer;
 
 namespace VStore.Infrastructure.RabbitMQ.PayOsService;
@@ -23,13 +25,18 @@ public class PayOsConsumerService : IPayOsConsumerService
     private readonly QueueSettings _queueSettings;
     private readonly IPayOsService _payOsService;
     private readonly IServiceProvider _serviceProvider;
+    private readonly PresenceTracker _presenceTracker;
+    private readonly IHubContext<PresenceHub> _presenceHub;
 
     public PayOsConsumerService(ILogger<PayOsConsumerService> logger, RabbitMqService rabbitMqService,
-        IOptionsMonitor<QueueSettings> options, IPayOsService payOsService, IServiceProvider serviceProvider)
+        IOptionsMonitor<QueueSettings> options, IPayOsService payOsService, IServiceProvider serviceProvider,
+        PresenceTracker presenceTracker, IHubContext<PresenceHub> presenceHub)
     {
         _logger = logger;
         _payOsService = payOsService;
         _serviceProvider = serviceProvider;
+        _presenceTracker = presenceTracker;
+        _presenceHub = presenceHub;
         _queueSettings = options.Get(QueueSettings.PayOsSection);
         _channel = rabbitMqService.CreateChannel(false, "PayOs").Result;
         _channel.ExchangeDeclareAsync(_queueSettings.ExchangeName, ExchangeType.Direct);
@@ -112,6 +119,13 @@ public class PayOsConsumerService : IPayOsConsumerService
 
                     orderRepository.Update(order);
                     await unitOfWork.SaveChangesAsync();
+
+                    // Add SignalR notification
+                    var connectionId = await _presenceTracker.GetConnectionsForUser(order.CustomerId);
+                    if (connectionId != null)
+                    {
+                        await _presenceHub.Clients.Clients(connectionId).SendAsync("OrderUpdated", order.Status);
+                    }
                 }
             }
             catch (Exception ex)
