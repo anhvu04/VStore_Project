@@ -5,13 +5,13 @@ using Microsoft.AspNetCore.StaticFiles;
 namespace VStore.API.Controllers;
 
 [ApiController]
-[Route("api")]
+[Route("api/files")]
 public class FileController(ISender sender) : ApiController(sender)
 {
     private static readonly string BasePath = Directory.GetCurrentDirectory();
 
     [HttpGet]
-    [Route("files/{filePath}")]
+    [Route("{filePath}")]
     public IActionResult GetFile([FromRoute] string filePath)
     {
         // Decode the URL-encoded file path (handles %2F)
@@ -34,5 +34,31 @@ public class FileController(ISender sender) : ApiController(sender)
         }
 
         return PhysicalFile(path, contentType);
+    }
+
+    [HttpDelete("{filePath}")]
+    public IActionResult DeleteFile([FromRoute] string filePath)
+    {
+        // Decode the URL-encoded file path (handles %2F)
+        var parts = filePath.Split("%2F");
+        // Combine the parts to get the full path
+        var path = Path.Combine(parts);
+        path = Path.Combine(BasePath, path);
+
+        if (!System.IO.File.Exists(path))
+        {
+            return NotFound();
+        }
+
+        try
+        {
+            System.IO.File.Delete(path);
+        }
+        catch (Exception e)
+        {
+            return BadRequest(e.Message);
+        }
+
+        return Ok();
     }
 }
