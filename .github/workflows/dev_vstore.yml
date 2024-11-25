@@ -34,7 +34,7 @@ jobs:
           context: .
           file: ./Dockerfile  # Path to Dockerfile
           push: true
-          tags: ${{ secrets.DOCKER_USERNAME }}/vstore:latest
+          tags: ${{ secrets.DOCKER_TAG }}/vstore:latest
 
   build-and-deploy:
       if: github.ref == 'refs/heads/main'
@@ -57,7 +57,7 @@ jobs:
               echo "${{ secrets.ENV_PRODUCTION }}" > .env
 
               # Pull the latest image from Docker Hub
-              docker pull ${{ secrets.DOCKER_USERNAME }}/vstore:latest
+              docker pull ${{ secrets.DOCKER_TAG }}/vstore:latest
 
               # Build và khởi động Docker Compose
               docker-compose down
