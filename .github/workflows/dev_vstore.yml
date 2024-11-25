@@ -17,7 +17,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Create .env file from secrets
-        run:  printf "%s" "${{ secrets.ENV_PRODUCTION }}" > .env
+        run: echo "${{ secrets.ENV_PRODUCTION }}" > .env
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v1
@@ -54,7 +54,7 @@ jobs:
               cd /home/panhvuu04/VStore/
 
               # Tạo file .env từ secret ENV_PRODUCTION
-              printf "%s" "${{ secrets.ENV_PRODUCTION }}" > .env
+              echo "${{ secrets.ENV_PRODUCTION }}" > .env
 
               # Pull the latest image from Docker Hub
               docker pull ${{ secrets.DOCKER_USERNAME }}/vstore:latest
