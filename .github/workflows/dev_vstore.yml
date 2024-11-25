@@ -61,6 +61,6 @@ jobs:
             docker pull ${{ secrets.DOCKER_TAG }}/vstore:latest
             
             # Build và khởi động Docker Compose
-            docker-compose down
-            docker-compose build
-            docker-compose up -d --force-recreate --remove-orphans
+            docker compose down
+            docker compose build
+            docker compose up -d --force-recreate --remove-orphans
