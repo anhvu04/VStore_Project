@@ -48,7 +48,7 @@ jobs:
         uses: appleboy/ssh-action@v1.0.0
         with:
           host: 157.66.218.185  # Địa chỉ IP của server
-          username: panhvuu04  # Tên người dùng SSH
+          username: root  # Tên người dùng SSH
           password: ${{ secrets.SSH_PASSWORD }}  # Mật khẩu SSH
           script: |
             # Di chuyển đến thư mục chứa project (có thể thay đổi theo project của bạn)
