@@ -2,6 +2,7 @@ using Serilog;
 using VStore.API.DependencyInjection;
 using VStore.Infrastructure.SignalR.MessageHub;
 using VStore.Infrastructure.SignalR.PresenceHub;
+using VStore.Persistence.DependencyInjection.Extensions;
 
 namespace VStore.API;
 
@@ -32,6 +33,7 @@ public class Program
 
         app.UseSwagger();
         app.UseSwaggerUI();
+        app.ApplyMigrations();
         app.MapHub<MessageHub>("/hubs/message");
         app.MapHub<PresenceHub>("hubs/presence");
         app.UseHttpsRedirection();
