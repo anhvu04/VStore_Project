@@ -8,6 +8,7 @@ using VStore.Application.Models;
 using VStore.Application.Models.VnPayService;
 using VStore.Domain.Abstractions;
 using VStore.Domain.Abstractions.Repositories;
+using VStore.Domain.Entities;
 using VStore.Infrastructure.SignalR.PresenceHub;
 
 namespace VStore.Infrastructure.VnPayService;
@@ -98,6 +99,7 @@ public class VnPayService : IVnPayService
             var unitOfWork = serviceProvider.ServiceProvider.GetRequiredService<IUnitOfWork>();
             var orderRepository = serviceProvider.ServiceProvider
                 .GetRequiredService<IOrderRepository>();
+            var orderLogRepository = serviceProvider.ServiceProvider.GetRequiredService<IOrderLogRepository>();
             var productRepository = serviceProvider.ServiceProvider.GetRequiredService<IProductRepository>();
 
             var orderCode = long.Parse(_vnpay.GetResponseData("vnp_TxnRef"));
@@ -137,10 +139,22 @@ public class VnPayService : IVnPayService
             if (responseCode == "00" && transactionStatus == "00")
             {
                 order.Status = Domain.Enums.OrderStatus.Processing;
+                order.OrderLogs.Add(new OrderLog
+                {
+                    // OrderId = order.Id,
+                    Status = Domain.Enums.OrderStatus.Processing,
+                    CreatedDate = DateTime.UtcNow
+                });
             }
             else
             {
                 order.Status = Domain.Enums.OrderStatus.Cancelled;
+                order.OrderLogs.Add(new OrderLog
+                {
+                    // OrderId = order.Id,
+                    Status = Domain.Enums.OrderStatus.Cancelled,
+                    CreatedDate = DateTime.UtcNow
+                });
                 foreach (var product in order.OrderDetails)
                 {
                     product.Product.Quantity += product.Quantity;
