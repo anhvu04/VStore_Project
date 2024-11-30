@@ -26,5 +26,6 @@ public class OrderMapper : Profile
             .ForMember(x => x.OrderStatus, opt => opt.MapFrom(x => x.Status))
             .ForMember(x => x.ProductDetails, opt => opt.MapFrom(x => x.OrderDetails));
         CreateMap<OrderDetail, DetailModel>();
+        CreateMap<OrderLog, OrderLogModel>().ForMember(x => x.Status, opt => opt.MapFrom(x => x.Status));
     }
 }

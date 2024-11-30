@@ -33,4 +33,5 @@ public class Order : EntityBase<Guid>, IDateTracking
     public OrderStatus Status { get; set; }
     public virtual Customer Customer { get; set; } = null!;
     public virtual ICollection<OrderDetail> OrderDetails { get; set; } = [];
+    public virtual ICollection<OrderLog> OrderLogs { get; set; } = [];
 }

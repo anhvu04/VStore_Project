@@ -31,6 +31,7 @@ public class GetOrderQueryHandler : IQueryHandler<GetOrderQuery, OrderDetailMode
         }
 
         var order = await _orderRepository.FindAll(predicate).Include(x => x.OrderDetails)
+            .Include(x => x.OrderLogs)
             .ProjectTo<OrderDetailModel>(_mapper.ConfigurationProvider)
             .FirstOrDefaultAsync(cancellationToken);
         if (order == null)
