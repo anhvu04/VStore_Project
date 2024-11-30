@@ -75,6 +75,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IOrderDetailRepository, OrderDetailRepository>();
         services.AddScoped<IMessageRepository, MessageRepository>();
         services.AddScoped<IGroupRepository, GroupRepository>();
+        services.AddScoped<IOrderLogRepository, OrderLogRepository>();
         services.AddScoped<IUnitOfWork, UnitOfWork>();
     }
 }

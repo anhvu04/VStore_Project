@@ -3,6 +3,7 @@ using VStore.Application.Abstractions.MediatR;
 using VStore.Application.Abstractions.PayOsService;
 using VStore.Domain.Abstractions;
 using VStore.Domain.Abstractions.Repositories;
+using VStore.Domain.Entities;
 using VStore.Domain.Enums;
 using VStore.Domain.Errors.DomainErrors;
 using VStore.Domain.Shared;
@@ -58,6 +59,12 @@ public class CancelOrderCustomerCommandHandler : ICommandHandler<CancelOrderCust
         }
 
         order.Status = OrderStatus.Cancelled;
+        order.OrderLogs.Add(new OrderLog
+        {
+            // OrderId = order.Id,
+            Status = OrderStatus.Cancelled,
+            CreatedDate = DateTime.UtcNow
+        });
         foreach (var orderDetail in order.OrderDetails)
         {
             if (orderDetail.Product.Status == ProductStatus.OutOfStock)

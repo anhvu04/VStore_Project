@@ -6,4 +6,5 @@ public record OrderDetailModel : OrderModel
     public string PhoneNumber { get; set; }
     public string Address { get; set; }
     public int ShippingFee { get; set; }
+    public List<OrderLogModel> OrderLogs { get; set; }
 }

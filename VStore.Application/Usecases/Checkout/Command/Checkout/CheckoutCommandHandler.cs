@@ -28,11 +28,13 @@ public class CheckoutCommandHandler : ICommandHandler<CheckoutCommand, CheckoutR
     private readonly IProductRepository _productRepository;
     private readonly IPayOsService _payOsService;
     private readonly IVnPayService _vnPayService;
+    private readonly IOrderLogRepository _orderLogRepository;
 
     public CheckoutCommandHandler(ICartRepository cartRepository, IUnitOfWork unitOfWork, IMapper mapper,
         ICustomerAddressRepository customerAddressRepository, IOrderRepository orderRepository,
         IOrderDetailRepository orderDetailRepository, ICartDetailRepository cartDetailRepository,
-        IProductRepository productRepository, IPayOsService payOsService, IVnPayService vnPayService)
+        IProductRepository productRepository, IPayOsService payOsService, IVnPayService vnPayService,
+        IOrderLogRepository orderLogRepository)
     {
         _cartRepository = cartRepository;
         _unitOfWork = unitOfWork;
@@ -44,6 +46,7 @@ public class CheckoutCommandHandler : ICommandHandler<CheckoutCommand, CheckoutR
         _productRepository = productRepository;
         _payOsService = payOsService;
         _vnPayService = vnPayService;
+        _orderLogRepository = orderLogRepository;
     }
 
     public async Task<Result<CheckoutResponseModel>> Handle(CheckoutCommand request,
@@ -104,6 +107,14 @@ public class CheckoutCommandHandler : ICommandHandler<CheckoutCommand, CheckoutR
             Status = OrderStatus.Pending
         };
         _orderRepository.Add(order);
+
+        //add to order log
+        order.OrderLogs.Add(new OrderLog
+        {
+            // OrderId = order.Id,
+            Status = OrderStatus.Pending,
+            CreatedDate = DateTime.UtcNow
+        });
 
         //add to order detail
         var orderDetail = cart.OrderDetail.Select(x => _mapper.Map<OrderDetail>(x)).ToList();

@@ -11,6 +11,7 @@ using VStore.Application.Abstractions.RabbitMqService.Consumer;
 using VStore.Application.Models.PayOsService;
 using VStore.Domain.Abstractions;
 using VStore.Domain.Abstractions.Repositories;
+using VStore.Domain.Entities;
 using VStore.Domain.Enums;
 using VStore.Infrastructure.DependencyInjection.Options.RabbitMqSettings;
 using VStore.Infrastructure.SignalR.PresenceHub;
@@ -106,6 +107,12 @@ public class PayOsConsumerService : IPayOsConsumerService
 
                     _logger.LogInformation($"Order: {orderCode} is cancelled successfully");
                     order.Status = OrderStatus.Cancelled;
+                    order.OrderLogs.Add(new OrderLog
+                    {
+                        // OrderId = order.Id,
+                        Status = OrderStatus.Cancelled,
+                        CreatedDate = DateTime.UtcNow
+                    });
                     foreach (var product in order.OrderDetails)
                     {
                         if (product.Product.Status == ProductStatus.OutOfStock)
