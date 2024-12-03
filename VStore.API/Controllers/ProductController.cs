@@ -16,6 +16,9 @@ using VStore.Application.Usecases.Product.Command.DeleteProduct;
 using VStore.Application.Usecases.Product.Command.UpdateProduct;
 using VStore.Application.Usecases.Product.Query.GetProduct;
 using VStore.Application.Usecases.Product.Query.GetProducts;
+using VStore.Application.Usecases.ProductImage.Command.CreateProductImage;
+using VStore.Application.Usecases.ProductImage.Command.DeleteProductImage;
+using VStore.Application.Usecases.ProductImage.Command.UpdateProductImage;
 using VStore.Domain.AuthenticationScheme;
 using VStore.Domain.Enums;
 
@@ -153,6 +156,37 @@ public class ProductController(ISender sender) : ApiController(sender)
     public async Task<IActionResult> DeleteCategory([FromRoute] int id)
     {
         var command = new DeleteCategoryCommand(id);
+        var res = await Sender.Send(command);
+        return res.IsSuccess ? Ok() : BadRequest(res.Error);
+    }
+
+    #endregion
+
+    #region Images
+
+    [HttpPost("{id}/images")]
+    [Authorize(AuthenticationSchemes = AuthenticationScheme.Access, Roles = nameof(Role.Admin))]
+    public async Task<IActionResult> CreateProductImage(Guid id, [FromForm] List<IFormFile> images)
+    {
+        var command = new CreateProductImageCommand { ProductId = id, Images = images };
+        var res = await Sender.Send(command);
+        return res.IsSuccess ? Ok() : BadRequest(res.Error);
+    }
+
+    [HttpPatch("product-images/{id}")]
+    [Authorize(AuthenticationSchemes = AuthenticationScheme.Access, Roles = nameof(Role.Admin))]
+    public async Task<IActionResult> UpdateProductImage(int id, [FromBody] UpdateProductImageCommand command)
+    {
+        command = command with { Id = id };
+        var res = await Sender.Send(command);
+        return res.IsSuccess ? Ok() : BadRequest(res.Error);
+    }
+
+    [HttpDelete("product-images/{id}")]
+    [Authorize(AuthenticationSchemes = AuthenticationScheme.Access, Roles = nameof(Role.Admin))]
+    public async Task<IActionResult> DeleteProductImage(int id)
+    {
+        var command = new DeleteProductImageCommand(id);
         var res = await Sender.Send(command);
         return res.IsSuccess ? Ok() : BadRequest(res.Error);
     }

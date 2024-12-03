@@ -5,7 +5,7 @@ using System.Security.Cryptography;
 using System.Text;
 using Microsoft.AspNetCore.Http;
 
-namespace VStore.Infrastructure.VnPayService;
+namespace VStore.Infrastructure.VnPay;
 
 public class VnPayLibrary
 {

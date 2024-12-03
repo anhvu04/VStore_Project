@@ -25,4 +25,5 @@ public class Product : EntityAuditBase<Guid>
     public virtual ICollection<OrderDetail> OrderDetails { get; set; } = [];
     public virtual Category Category { get; set; } = null!;
     public virtual Brand Brand { get; set; } = null!;
+    public virtual ICollection<ProductImage> ProductImages { get; set; } = [];
 }
