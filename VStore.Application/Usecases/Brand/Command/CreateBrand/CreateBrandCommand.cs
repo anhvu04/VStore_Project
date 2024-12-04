@@ -7,4 +7,5 @@ namespace VStore.Application.Usecases.Brand.Command.CreateBrand;
 public record CreateBrandCommand : BrandModel, ICommand
 {
     [JsonIgnore] public new int Id { get; init; }
+    [JsonIgnore] public new string? Logo { get; init; }
 }

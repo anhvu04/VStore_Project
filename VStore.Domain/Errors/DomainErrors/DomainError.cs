@@ -47,6 +47,9 @@ public static class DomainError
     {
         public static readonly Error HasProduct =
             new("Error.Brand.HasProduct", "Brand has product.");
+
+        public static readonly Error InvalidFileExtension =
+            new("Error.Brand.InvalidFileExtension", "Invalid file extension.");
     }
 
     public static class Category
@@ -73,6 +76,9 @@ public static class DomainError
         public static Error ExceedQuantity(int quantity, int productQuantity) =>
             new("Error.Product.NotEnoughQuantity", $"You have already had {quantity} products in your cart. " +
                                                    $"The remaining quantity is {productQuantity - quantity}.");
+
+        public static readonly Error InvalidFileExtension =
+            new("Error.Brand.InvalidFileExtension", "Invalid file extension.");
     }
 
     public static class Cart
@@ -165,5 +171,15 @@ public static class DomainError
         public static readonly Error OrderCannotBeCancelledByUser =
             new("Error.Order.OrderCannotBeCancelledByUser",
                 "Order cannot be cancelled by user. Only pending orders can be cancelled by user.");
+    }
+
+    public static class ProductImage
+    {
+        public static Error UploadImageFail(string fileName) =>
+            new("Error.ProductImage.UploadImageFail", $"Error when uploading image {fileName}.");
+
+        public static readonly Error ExceedLimit =
+            new("Error.ProductImage.ExceedLimit",
+                "Exceed the limit of product images. Maximum is 10 images per product.");
     }
 }

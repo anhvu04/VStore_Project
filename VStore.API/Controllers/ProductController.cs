@@ -2,6 +2,7 @@ using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using VStore.Application.Usecases.Brand.Command.CreateBrand;
+using VStore.Application.Usecases.Brand.Command.CreateBrandLogo;
 using VStore.Application.Usecases.Brand.Command.DeleteBrand;
 using VStore.Application.Usecases.Brand.Command.UpdateBrand;
 using VStore.Application.Usecases.Brand.Query.GetBrand;
@@ -12,10 +13,14 @@ using VStore.Application.Usecases.Category.Command.UpdateCategory;
 using VStore.Application.Usecases.Category.Query.GetCategories;
 using VStore.Application.Usecases.Category.Query.GetCategory;
 using VStore.Application.Usecases.Product.Command.CreateProduct;
+using VStore.Application.Usecases.Product.Command.CreateProductThumbnail;
 using VStore.Application.Usecases.Product.Command.DeleteProduct;
 using VStore.Application.Usecases.Product.Command.UpdateProduct;
 using VStore.Application.Usecases.Product.Query.GetProduct;
 using VStore.Application.Usecases.Product.Query.GetProducts;
+using VStore.Application.Usecases.ProductImage.Command.CreateProductImage;
+using VStore.Application.Usecases.ProductImage.Command.DeleteProductImage;
+using VStore.Application.Usecases.ProductImage.Command.UpdateProductImage;
 using VStore.Domain.AuthenticationScheme;
 using VStore.Domain.Enums;
 
@@ -39,6 +44,14 @@ public class ProductController(ISender sender) : ApiController(sender)
         var query = new GetProductQuery(id);
         var res = await Sender.Send(query);
         return res.IsSuccess ? Ok(res.Value) : BadRequest(res.Error);
+    }
+
+    [HttpPost("{id}/thumbnail")]
+    public async Task<IActionResult> CreateProductThumbnail(Guid id, IFormFile thumbnail)
+    {
+        var command = new CreateProductThumbnailCommand { ProductId = id, Thumbnail = thumbnail };
+        var res = await Sender.Send(command);
+        return res.IsSuccess ? Ok() : BadRequest(res.Error);
     }
 
     [HttpPost]
@@ -90,6 +103,15 @@ public class ProductController(ISender sender) : ApiController(sender)
     [Authorize(AuthenticationSchemes = AuthenticationScheme.Access, Roles = nameof(Role.Admin))]
     public async Task<IActionResult> CreateBrand([FromBody] CreateBrandCommand command)
     {
+        var res = await Sender.Send(command);
+        return res.IsSuccess ? Ok() : BadRequest(res.Error);
+    }
+
+    [HttpPost("brands/{id}/logo")]
+    [Authorize(AuthenticationSchemes = AuthenticationScheme.Access, Roles = nameof(Role.Admin))]
+    public async Task<IActionResult> CreateBrandLogo([FromRoute] int id, IFormFile logo)
+    {
+        var command = new CreateBrandLogoCommand { Id = id, Logo = logo };
         var res = await Sender.Send(command);
         return res.IsSuccess ? Ok() : BadRequest(res.Error);
     }
@@ -153,6 +175,37 @@ public class ProductController(ISender sender) : ApiController(sender)
     public async Task<IActionResult> DeleteCategory([FromRoute] int id)
     {
         var command = new DeleteCategoryCommand(id);
+        var res = await Sender.Send(command);
+        return res.IsSuccess ? Ok() : BadRequest(res.Error);
+    }
+
+    #endregion
+
+    #region Images
+
+    [HttpPost("{id}/images")]
+    [Authorize(AuthenticationSchemes = AuthenticationScheme.Access, Roles = nameof(Role.Admin))]
+    public async Task<IActionResult> CreateProductImage(Guid id, [FromForm] List<IFormFile> images)
+    {
+        var command = new CreateProductImageCommand { ProductId = id, Images = images };
+        var res = await Sender.Send(command);
+        return res.IsSuccess ? Ok() : BadRequest(res.Error);
+    }
+
+    [HttpPatch("product-images/{id}")]
+    [Authorize(AuthenticationSchemes = AuthenticationScheme.Access, Roles = nameof(Role.Admin))]
+    public async Task<IActionResult> UpdateProductImage(int id, [FromBody] UpdateProductImageCommand command)
+    {
+        command = command with { Id = id };
+        var res = await Sender.Send(command);
+        return res.IsSuccess ? Ok() : BadRequest(res.Error);
+    }
+
+    [HttpDelete("product-images/{id}")]
+    [Authorize(AuthenticationSchemes = AuthenticationScheme.Access, Roles = nameof(Role.Admin))]
+    public async Task<IActionResult> DeleteProductImage(int id)
+    {
+        var command = new DeleteProductImageCommand(id);
         var res = await Sender.Send(command);
         return res.IsSuccess ? Ok() : BadRequest(res.Error);
     }

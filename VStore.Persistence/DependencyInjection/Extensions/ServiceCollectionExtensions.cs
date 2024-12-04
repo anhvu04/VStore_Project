@@ -32,7 +32,7 @@ public static class ServiceCollectionExtensions
             }
             else
             {
-                var server = configuration["SERVER"] ?? "PANHVU04\\SQLEXPRESS";
+                var server = configuration["SERVER"] ?? "host.docker.internal";
                 var port = configuration["PORT"] ?? "1433";
                 var database = configuration["DATABASE"] ?? "VStoreDB";
                 var user = configuration["USER"] ?? "sa";
@@ -76,6 +76,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IMessageRepository, MessageRepository>();
         services.AddScoped<IGroupRepository, GroupRepository>();
         services.AddScoped<IOrderLogRepository, OrderLogRepository>();
+        services.AddScoped<IProductImageRepository, ProductImageRepository>();
         services.AddScoped<IUnitOfWork, UnitOfWork>();
     }
 }
