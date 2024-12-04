@@ -8,6 +8,7 @@ using Quartz.Impl;
 using Quartz.Spi;
 using VStore.Application.Abstractions.Authentication;
 using VStore.Application.Abstractions.BCrypt;
+using VStore.Application.Abstractions.CloudinaryService;
 using VStore.Application.Abstractions.EmailService;
 using VStore.Application.Abstractions.GhnService;
 using VStore.Application.Abstractions.PayOsService;
@@ -17,6 +18,7 @@ using VStore.Application.Abstractions.RabbitMqService.Producer;
 using VStore.Application.Abstractions.VNPayService;
 using VStore.Domain.AuthenticationScheme;
 using VStore.Infrastructure.BCrypt;
+using VStore.Infrastructure.Cloudinary;
 using VStore.Infrastructure.DependencyInjection.Options.EmailSettings;
 using VStore.Infrastructure.DependencyInjection.Options.RabbitMqSettings;
 using VStore.Infrastructure.Email;
@@ -28,7 +30,7 @@ using VStore.Infrastructure.RabbitMQ;
 using VStore.Infrastructure.RabbitMQ.EmailService;
 using VStore.Infrastructure.RabbitMQ.PayOsService;
 using VStore.Infrastructure.SignalR.PresenceHub;
-using VStore.Infrastructure.VnPayService;
+using VStore.Infrastructure.VnPay;
 
 namespace VStore.Infrastructure.DependencyInjection.Extensions;
 
@@ -43,6 +45,7 @@ public static class ServiceCollectionExtensions
         services.AddSignalRService();
         services.AddDependencies();
         services.AddHostedService<HostedService.AppHostedService>();
+        services.AddCloudinaryService(configuration);
     }
 
     private static void AddJwtBearerAuthentication(this IServiceCollection services, IConfiguration configuration)
@@ -143,12 +146,17 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<PresenceTracker>();
     }
 
+    private static void AddCloudinaryService(this IServiceCollection services, IConfiguration configuration)
+    {
+        services.AddSingleton<ICloudinaryService, CloudinaryService>();
+    }
+
     private static void AddDependencies(this IServiceCollection services)
     {
         services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
         services.AddScoped<IPasswordHasher, BCryptPasswordHasher>();
         services.AddSingleton<IPayOsService, PayOsService>();
-        services.AddSingleton<IVnPayService, VnPayService.VnPayService>();
+        services.AddSingleton<IVnPayService, VnPayService>();
         services.AddSingleton<VnPayLibrary>();
         services.AddSingleton<PayOsLibrary>();
         services.AddSingleton<IGhnService, GhnService>();

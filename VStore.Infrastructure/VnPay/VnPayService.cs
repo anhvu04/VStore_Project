@@ -11,7 +11,7 @@ using VStore.Domain.Abstractions.Repositories;
 using VStore.Domain.Entities;
 using VStore.Infrastructure.SignalR.PresenceHub;
 
-namespace VStore.Infrastructure.VnPayService;
+namespace VStore.Infrastructure.VnPay;
 
 public class VnPayService : IVnPayService
 {

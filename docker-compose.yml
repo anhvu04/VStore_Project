@@ -44,6 +44,7 @@ services:
       - vstore-network
     volumes:
       - ./vstore.api/logs:/app/logs
+      - ./vstore.api/wwwroot:/app/wwwroot
 
 networks:
   vstore-network:
