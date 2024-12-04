@@ -55,6 +55,20 @@ public static class CoreHelper
     {
         return isDescending ? source.OrderByDescending(sortProperty) : source.OrderBy(sortProperty);
     }
+
+    public static bool IsValidFileExtension(this string extension)
+    {
+        return extension switch
+        {
+            ".jpg" => true,
+            ".jpeg" => true,
+            ".png" => true,
+            ".gif" => true,
+            ".webp" => true,
+            ".svg" => true,
+            _ => false
+        };
+    }
 }
 
 internal class ReplaceExpressionVisitor(Expression oldValue, Expression newValue) : ExpressionVisitor

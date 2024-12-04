@@ -47,6 +47,9 @@ public static class DomainError
     {
         public static readonly Error HasProduct =
             new("Error.Brand.HasProduct", "Brand has product.");
+
+        public static readonly Error InvalidFileExtension =
+            new("Error.Brand.InvalidFileExtension", "Invalid file extension.");
     }
 
     public static class Category
@@ -73,6 +76,9 @@ public static class DomainError
         public static Error ExceedQuantity(int quantity, int productQuantity) =>
             new("Error.Product.NotEnoughQuantity", $"You have already had {quantity} products in your cart. " +
                                                    $"The remaining quantity is {productQuantity - quantity}.");
+
+        public static readonly Error InvalidFileExtension =
+            new("Error.Brand.InvalidFileExtension", "Invalid file extension.");
     }
 
     public static class Cart

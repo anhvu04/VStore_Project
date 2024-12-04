@@ -2,6 +2,7 @@ using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using VStore.Application.Usecases.Brand.Command.CreateBrand;
+using VStore.Application.Usecases.Brand.Command.CreateBrandLogo;
 using VStore.Application.Usecases.Brand.Command.DeleteBrand;
 using VStore.Application.Usecases.Brand.Command.UpdateBrand;
 using VStore.Application.Usecases.Brand.Query.GetBrand;
@@ -12,6 +13,7 @@ using VStore.Application.Usecases.Category.Command.UpdateCategory;
 using VStore.Application.Usecases.Category.Query.GetCategories;
 using VStore.Application.Usecases.Category.Query.GetCategory;
 using VStore.Application.Usecases.Product.Command.CreateProduct;
+using VStore.Application.Usecases.Product.Command.CreateProductThumbnail;
 using VStore.Application.Usecases.Product.Command.DeleteProduct;
 using VStore.Application.Usecases.Product.Command.UpdateProduct;
 using VStore.Application.Usecases.Product.Query.GetProduct;
@@ -42,6 +44,14 @@ public class ProductController(ISender sender) : ApiController(sender)
         var query = new GetProductQuery(id);
         var res = await Sender.Send(query);
         return res.IsSuccess ? Ok(res.Value) : BadRequest(res.Error);
+    }
+
+    [HttpPost("{id}/thumbnail")]
+    public async Task<IActionResult> CreateProductThumbnail(Guid id, IFormFile thumbnail)
+    {
+        var command = new CreateProductThumbnailCommand { ProductId = id, Thumbnail = thumbnail };
+        var res = await Sender.Send(command);
+        return res.IsSuccess ? Ok() : BadRequest(res.Error);
     }
 
     [HttpPost]
@@ -93,6 +103,15 @@ public class ProductController(ISender sender) : ApiController(sender)
     [Authorize(AuthenticationSchemes = AuthenticationScheme.Access, Roles = nameof(Role.Admin))]
     public async Task<IActionResult> CreateBrand([FromBody] CreateBrandCommand command)
     {
+        var res = await Sender.Send(command);
+        return res.IsSuccess ? Ok() : BadRequest(res.Error);
+    }
+
+    [HttpPost("brands/{id}/logo")]
+    [Authorize(AuthenticationSchemes = AuthenticationScheme.Access, Roles = nameof(Role.Admin))]
+    public async Task<IActionResult> CreateBrandLogo([FromRoute] int id, IFormFile logo)
+    {
+        var command = new CreateBrandLogoCommand { Id = id, Logo = logo };
         var res = await Sender.Send(command);
         return res.IsSuccess ? Ok() : BadRequest(res.Error);
     }

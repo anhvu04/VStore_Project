@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.StaticFiles;
 using Serilog;
 using VStore.API.DependencyInjection;
 using VStore.Infrastructure.SignalR.MessageHub;
@@ -34,6 +35,30 @@ public class Program
         app.UseSwagger();
         app.UseSwaggerUI();
         app.ApplyMigrations();
+        app.UseStaticFiles(new StaticFileOptions
+        {
+            ContentTypeProvider = new FileExtensionContentTypeProvider
+            {
+                Mappings =
+                {
+                    [".jpg"] = "image/jpeg",
+                    [".jpeg"] = "image/jpeg",
+                    [".png"] = "image/png",
+                    [".gif"] = "image/gif",
+                    [".webp"] = "image/webp",
+                    [".svg"] = "image/svg+xml",
+                }
+            },
+            OnPrepareResponse = ctx =>
+            {
+                // allow all origins (for demo purposes only)
+                ctx.Context.Response.Headers.Append("Access-Control-Allow-Origin", "*");
+                // Disable caching
+                ctx.Context.Response.Headers.Append("Cache-Control", "no-store, no-cache, must-revalidate");
+                ctx.Context.Response.Headers.Append("Pragma", "no-cache");
+                ctx.Context.Response.Headers.Append("Expires", "0");
+            }
+        });
         app.MapHub<MessageHub>("/hubs/message");
         app.MapHub<PresenceHub>("hubs/presence");
         app.UseHttpsRedirection();
