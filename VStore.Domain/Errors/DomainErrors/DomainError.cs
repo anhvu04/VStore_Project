@@ -182,4 +182,10 @@ public static class DomainError
             new("Error.ProductImage.ExceedLimit",
                 "Exceed the limit of product images. Maximum is 10 images per product.");
     }
+
+    public static class RedisCart
+    {
+        public static readonly Error NotExistProduct =
+            new("Error.RedisCart.NotExistProduct", "Invalid product in redis cart. Product does not exist.");
+    }
 }
