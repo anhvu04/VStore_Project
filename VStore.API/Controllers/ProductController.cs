@@ -1,6 +1,7 @@
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using VStore.API.Common;
 using VStore.Application.Usecases.Brand.Command.CreateBrand;
 using VStore.Application.Usecases.Brand.Command.CreateBrandLogo;
 using VStore.Application.Usecases.Brand.Command.DeleteBrand;
@@ -32,6 +33,7 @@ public class ProductController(ISender sender) : ApiController(sender)
     #region Products
 
     [HttpGet]
+    [CacheResponse(600)]
     public async Task<IActionResult> GetProducts([FromQuery] GetProductsQuery query)
     {
         var res = await Sender.Send(query);
@@ -39,6 +41,7 @@ public class ProductController(ISender sender) : ApiController(sender)
     }
 
     [HttpGet("{id}")]
+    [CacheResponse(600)]
     public async Task<IActionResult> GetProduct([FromRoute] Guid id)
     {
         var query = new GetProductQuery(id);
@@ -56,6 +59,7 @@ public class ProductController(ISender sender) : ApiController(sender)
 
     [HttpPost]
     [Authorize(AuthenticationSchemes = AuthenticationScheme.Access, Roles = nameof(Role.Admin))]
+    [InvalidateCache("/api/products/")]
     public async Task<IActionResult> CreateProduct([FromBody] CreateProductCommand command)
     {
         var res = await Sender.Send(command);
@@ -64,6 +68,7 @@ public class ProductController(ISender sender) : ApiController(sender)
 
     [HttpPatch("{id}")]
     [Authorize(AuthenticationSchemes = AuthenticationScheme.Access, Roles = nameof(Role.Admin))]
+    [InvalidateCache("/api/products/")]
     public async Task<IActionResult> UpdateProduct([FromRoute] Guid id, [FromBody] UpdateProductCommand command)
     {
         command = command with { Id = id };
@@ -73,6 +78,7 @@ public class ProductController(ISender sender) : ApiController(sender)
 
     [HttpDelete("{id}")]
     [Authorize(AuthenticationSchemes = AuthenticationScheme.Access, Roles = nameof(Role.Admin))]
+    [InvalidateCache("/api/products/")]
     public async Task<IActionResult> DeleteProduct([FromRoute] Guid id)
     {
         var command = new DeleteProductCommand(id);
@@ -84,6 +90,7 @@ public class ProductController(ISender sender) : ApiController(sender)
 
     #region Brands
 
+    [CacheResponse(600)]
     [HttpGet("brands")]
     public async Task<IActionResult> GetBrands([FromQuery] GetBrandsQuery query)
     {
@@ -91,6 +98,7 @@ public class ProductController(ISender sender) : ApiController(sender)
         return res.IsSuccess ? Ok(res.Value) : BadRequest(res.Error);
     }
 
+    [CacheResponse(600)]
     [HttpGet("brands/{id}")]
     public async Task<IActionResult> GetBrand([FromRoute] int id)
     {
@@ -100,6 +108,7 @@ public class ProductController(ISender sender) : ApiController(sender)
     }
 
     [HttpPost("brands")]
+    [InvalidateCache("/api/products/brands/")]
     [Authorize(AuthenticationSchemes = AuthenticationScheme.Access, Roles = nameof(Role.Admin))]
     public async Task<IActionResult> CreateBrand([FromBody] CreateBrandCommand command)
     {
@@ -116,6 +125,7 @@ public class ProductController(ISender sender) : ApiController(sender)
         return res.IsSuccess ? Ok() : BadRequest(res.Error);
     }
 
+    [InvalidateCache("/api/products/brands/")]
     [HttpPatch("brands/{id}")]
     [Authorize(AuthenticationSchemes = AuthenticationScheme.Access, Roles = nameof(Role.Admin))]
     public async Task<IActionResult> UpdateBrand([FromRoute] int id, [FromBody] UpdateBrandCommand command)
@@ -125,6 +135,7 @@ public class ProductController(ISender sender) : ApiController(sender)
         return res.IsSuccess ? Ok() : BadRequest(res.Error);
     }
 
+    [InvalidateCache("/api/products/brands/")]
     [HttpDelete("brands/{id}")]
     [Authorize(AuthenticationSchemes = AuthenticationScheme.Access, Roles = nameof(Role.Admin))]
     public async Task<IActionResult> DeleteBrand([FromRoute] int id)
@@ -138,6 +149,7 @@ public class ProductController(ISender sender) : ApiController(sender)
 
     #region Categories
 
+    [CacheResponse(600)]
     [HttpGet("categories")]
     public async Task<IActionResult> GetCategories([FromQuery] GetCategoriesQuery query)
     {
@@ -145,6 +157,7 @@ public class ProductController(ISender sender) : ApiController(sender)
         return res.IsSuccess ? Ok(res.Value) : BadRequest(res.Error);
     }
 
+    [CacheResponse(600)]
     [HttpGet("categories/{id}")]
     public async Task<IActionResult> GetCategory([FromRoute] int id)
     {
@@ -154,6 +167,7 @@ public class ProductController(ISender sender) : ApiController(sender)
     }
 
     [HttpPost("categories")]
+    [InvalidateCache("/api/products/categories/")]
     [Authorize(AuthenticationSchemes = AuthenticationScheme.Access, Roles = nameof(Role.Admin))]
     public async Task<IActionResult> CreateCategory([FromBody] CreateCategoryCommand command)
     {
@@ -162,6 +176,7 @@ public class ProductController(ISender sender) : ApiController(sender)
     }
 
     [HttpPatch("categories/{id}")]
+    [InvalidateCache("/api/products/categories/")]
     [Authorize(AuthenticationSchemes = AuthenticationScheme.Access, Roles = nameof(Role.Admin))]
     public async Task<IActionResult> UpdateCategory([FromRoute] int id, [FromBody] UpdateCategoryCommand command)
     {
@@ -171,6 +186,7 @@ public class ProductController(ISender sender) : ApiController(sender)
     }
 
     [HttpDelete("categories/{id}")]
+    [InvalidateCache("/api/products/categories/")]
     [Authorize(AuthenticationSchemes = AuthenticationScheme.Access, Roles = nameof(Role.Admin))]
     public async Task<IActionResult> DeleteCategory([FromRoute] int id)
     {

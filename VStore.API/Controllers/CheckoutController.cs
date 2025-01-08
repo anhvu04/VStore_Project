@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using VStore.API.Common;
 using VStore.Application.Usecases.Checkout.Command.Checkout;
+using VStore.Application.Usecases.Checkout.Command.RedisCartCheckout;
 using VStore.Domain.Enums;
 using AuthenticationScheme = VStore.Domain.AuthenticationScheme.AuthenticationScheme;
 
@@ -21,6 +22,18 @@ public class CheckoutController(ISender sender) : ApiController(sender)
         var userId = Guid.Parse(HttpContext.User.Claims.FirstOrDefault(c => c.Type == "UserId")?.Value ??
                                 Guid.Empty.ToString());
         command = command with { UserId = userId, HttpContext = HttpContext };
+        var res = await Sender.Send(command);
+        return res.IsSuccess ? Ok(res.Value) : BadRequest(res.Error);
+    }
+
+    [HttpPost("redis")]
+    [Authorize(AuthenticationSchemes = AuthenticationScheme.Access, Roles = nameof(Role.Customer))]
+    [ServiceFilter(typeof(UserExistFilter))]
+    public async Task<IActionResult> CheckoutByRedisCart([FromBody] RedisCartCheckoutCommand command)
+    {
+        var userId = HttpContext.User.Claims.FirstOrDefault(c => c.Type == "UserId")?.Value ??
+                     Guid.Empty.ToString();
+        command = command with { CartId = userId, HttpContext = HttpContext};
         var res = await Sender.Send(command);
         return res.IsSuccess ? Ok(res.Value) : BadRequest(res.Error);
     }

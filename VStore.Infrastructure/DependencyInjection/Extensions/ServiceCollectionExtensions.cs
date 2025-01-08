@@ -6,6 +6,7 @@ using Microsoft.IdentityModel.Tokens;
 using Quartz;
 using Quartz.Impl;
 using Quartz.Spi;
+using StackExchange.Redis;
 using VStore.Application.Abstractions.Authentication;
 using VStore.Application.Abstractions.BCrypt;
 using VStore.Application.Abstractions.CloudinaryService;
@@ -15,6 +16,7 @@ using VStore.Application.Abstractions.PayOsService;
 using VStore.Application.Abstractions.QuartzService;
 using VStore.Application.Abstractions.RabbitMqService.Consumer;
 using VStore.Application.Abstractions.RabbitMqService.Producer;
+using VStore.Application.Abstractions.RedisCartService;
 using VStore.Application.Abstractions.VNPayService;
 using VStore.Domain.AuthenticationScheme;
 using VStore.Infrastructure.BCrypt;
@@ -29,6 +31,8 @@ using VStore.Infrastructure.Quartz;
 using VStore.Infrastructure.RabbitMQ;
 using VStore.Infrastructure.RabbitMQ.EmailService;
 using VStore.Infrastructure.RabbitMQ.PayOsService;
+using VStore.Infrastructure.Redis.RedisCacheResponse;
+using VStore.Infrastructure.Redis.RedisCartService;
 using VStore.Infrastructure.SignalR.PresenceHub;
 using VStore.Infrastructure.VnPay;
 
@@ -46,6 +50,7 @@ public static class ServiceCollectionExtensions
         services.AddDependencies();
         services.AddHostedService<HostedService.AppHostedService>();
         services.AddCloudinaryService(configuration);
+        services.AddRedisService(configuration);
     }
 
     private static void AddJwtBearerAuthentication(this IServiceCollection services, IConfiguration configuration)
@@ -149,6 +154,30 @@ public static class ServiceCollectionExtensions
     private static void AddCloudinaryService(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddSingleton<ICloudinaryService, CloudinaryService>();
+    }
+
+    private static void AddRedisService(this IServiceCollection services, IConfiguration configuration)
+    {
+        services.AddSingleton<IConnectionMultiplexer>(config =>
+        {
+            var env = configuration["ASPNETCORE_ENVIRONMENT"] ?? "Development";
+            string connectionString = "";
+            if (env == "Development")
+            {
+                connectionString = configuration.GetConnectionString("Redis")!;
+            }
+            else
+            {
+                var host = configuration["REDIS_HOST"] ?? "host.docker.internal";
+                connectionString = $"{host}";
+            }
+
+            Console.WriteLine($"Redis Connection String: {connectionString}");
+            var redisConfig = ConfigurationOptions.Parse(connectionString, true);
+            return ConnectionMultiplexer.Connect(redisConfig);
+        });
+        services.AddSingleton<IRedisCartService, RedisCartService>();
+        services.AddSingleton<IRedisCacheResponse, RedisCacheResponse>();
     }
 
     private static void AddDependencies(this IServiceCollection services)

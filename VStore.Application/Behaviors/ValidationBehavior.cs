@@ -26,6 +26,28 @@ public class ValidationBehavior<TRequest, TResponse>(IValidator<TRequest>? valid
             .Select(error => new Error(error.ErrorCode, error.ErrorMessage))
             .ToArray();
 
-        return (TResponse)(object)Result.Failure(new ValidationError(errors));
+        // Check if TResponse is a generic type Result<T>
+        if (typeof(TResponse).IsGenericType && typeof(TResponse).GetGenericTypeDefinition() == typeof(Result<>))
+        {
+            var genericArgument = typeof(TResponse).GetGenericArguments()[0];
+            var failureResult = CreateFailureResult(genericArgument, errors);
+            return (TResponse)failureResult;
+        }
+
+        if (typeof(TResponse) == typeof(Result))
+        {
+            // Handle non-generic Result type
+            return (TResponse)(object)Result.Failure(new ValidationError(errors));
+        }
+
+        // Handle unexpected types gracefully
+        throw new InvalidOperationException("Invalid response type.");
+    }
+
+    private static object CreateFailureResult(Type genericArgument, Error[] errors)
+    {
+        var resultType = typeof(Result<>).MakeGenericType(genericArgument);
+        var failureResult = Activator.CreateInstance(resultType, null, false, new ValidationError(errors));
+        return failureResult!;
     }
 }

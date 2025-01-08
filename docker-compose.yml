@@ -15,7 +15,8 @@ services:
       - vstore-network
     volumes:
       - sql-data:/var/opt/mssql
-      # rabbitmq service
+  
+  # rabbitmq service
   rabbitmq:
     image: rabbitmq:3-management
     container_name: rabbitmq
@@ -27,9 +28,25 @@ services:
     networks:
       - vstore-network
   
+  #redis service
+  redis:
+    image: redis:latest
+    container_name: vstore-redis
+    env_file:
+      - .env
+    ports:
+      - "6379:6379"
+    networks:
+      - vstore-network
+    volumes:
+      - redis-data:/data
+  
   # api service
   vstore.api:
-    image: ${DOCKER_USERNAME}/vstore:latest
+    #    image: ${DOCKER_USERNAME}/vstore:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
     restart: unless-stopped
     env_file:
       - .env
@@ -39,6 +56,8 @@ services:
       mssql:
         condition: service_started
       rabbitmq:
+        condition: service_started
+      redis:
         condition: service_started
     networks:
       - vstore-network
@@ -52,6 +71,7 @@ networks:
 volumes:
   vstore.api:
   sql-data:
+  redis-data:
   
       
   
