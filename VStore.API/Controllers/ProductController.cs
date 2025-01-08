@@ -1,6 +1,7 @@
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using VStore.API.Common;
 using VStore.Application.Usecases.Brand.Command.CreateBrand;
 using VStore.Application.Usecases.Brand.Command.CreateBrandLogo;
 using VStore.Application.Usecases.Brand.Command.DeleteBrand;
@@ -32,6 +33,7 @@ public class ProductController(ISender sender) : ApiController(sender)
     #region Products
 
     [HttpGet]
+    [CacheResponse(600)]
     public async Task<IActionResult> GetProducts([FromQuery] GetProductsQuery query)
     {
         var res = await Sender.Send(query);
@@ -39,6 +41,7 @@ public class ProductController(ISender sender) : ApiController(sender)
     }
 
     [HttpGet("{id}")]
+    [CacheResponse(600)]
     public async Task<IActionResult> GetProduct([FromRoute] Guid id)
     {
         var query = new GetProductQuery(id);
@@ -84,6 +87,7 @@ public class ProductController(ISender sender) : ApiController(sender)
 
     #region Brands
 
+    [CacheResponse(600)]
     [HttpGet("brands")]
     public async Task<IActionResult> GetBrands([FromQuery] GetBrandsQuery query)
     {
@@ -91,6 +95,7 @@ public class ProductController(ISender sender) : ApiController(sender)
         return res.IsSuccess ? Ok(res.Value) : BadRequest(res.Error);
     }
 
+    [CacheResponse(600)]
     [HttpGet("brands/{id}")]
     public async Task<IActionResult> GetBrand([FromRoute] int id)
     {
@@ -138,6 +143,7 @@ public class ProductController(ISender sender) : ApiController(sender)
 
     #region Categories
 
+    [CacheResponse(600)]
     [HttpGet("categories")]
     public async Task<IActionResult> GetCategories([FromQuery] GetCategoriesQuery query)
     {
@@ -145,6 +151,7 @@ public class ProductController(ISender sender) : ApiController(sender)
         return res.IsSuccess ? Ok(res.Value) : BadRequest(res.Error);
     }
 
+    [CacheResponse(600)]
     [HttpGet("categories/{id}")]
     public async Task<IActionResult> GetCategory([FromRoute] int id)
     {
