@@ -11,9 +11,9 @@ public class CacheResponseAttribute(int timeToLiveInSeconds) : Attribute, IAsync
 {
     public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
     {
-        var redisCacheResponse = context.HttpContext.RequestServices.GetRequiredService<IRedisCacheResponse>();
+        var requiredService = context.HttpContext.RequestServices.GetRequiredService<IRedisCacheResponse>();
         var key = GetCacheKey(context.HttpContext.Request);
-        var cacheResponse = await redisCacheResponse.GetCacheResponseAsync(key);
+        var cacheResponse = await requiredService.GetCacheResponseAsync(key);
         if (!string.IsNullOrEmpty(cacheResponse))
         {
             context.Result = new ContentResult
@@ -30,7 +30,7 @@ public class CacheResponseAttribute(int timeToLiveInSeconds) : Attribute, IAsync
         {
             if (objectResult.Value != null)
             {
-                await redisCacheResponse.SetCacheResponseAsync(key, objectResult.Value,
+                await requiredService.SetCacheResponseAsync(key, objectResult.Value,
                     TimeSpan.FromMinutes(timeToLiveInSeconds));
             }
         }

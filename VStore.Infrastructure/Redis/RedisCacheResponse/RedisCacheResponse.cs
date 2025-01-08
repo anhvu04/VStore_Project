@@ -4,14 +4,9 @@ using VStore.Application.Abstractions.RedisCartService;
 
 namespace VStore.Infrastructure.Redis.RedisCacheResponse;
 
-public class RedisCacheResponse : IRedisCacheResponse
+public class RedisCacheResponse(IConnectionMultiplexer redis) : IRedisCacheResponse
 {
-    private readonly IDatabase _redis;
-
-    public RedisCacheResponse(IConnectionMultiplexer redis)
-    {
-        _redis = redis.GetDatabase(1);
-    }
+    private readonly IDatabase _redis = redis.GetDatabase(1);
 
     public async Task<string?> GetCacheResponseAsync(string key)
     {
@@ -29,8 +24,31 @@ public class RedisCacheResponse : IRedisCacheResponse
         await _redis.StringSetAsync(key, data, timeToLive);
     }
 
-    public Task<bool> DeleteCacheResponseAsync(string key)
+    public async Task DeleteCacheResponseAsync(string pattern)
     {
-        throw new NotImplementedException();
+        var server = redis.GetServer(redis.GetEndPoints().First());
+        var keys = server.Keys(database: 1, pattern: $"*{pattern}*").ToArray();
+        if (keys.Length != 0)
+        {
+            foreach (var k in keys)
+            {
+                if (ValidatePattern(k, pattern))
+                {
+                    await _redis.KeyDeleteAsync(k);
+                }
+            }
+        }
+    }
+
+    private bool ValidatePattern(RedisKey redisKey, string pattern)
+    {
+        var key = redisKey.ToString().Split("/");
+        var patternKey = pattern.Split("/");
+        if (key.Length != patternKey.Length)
+        {
+            return false;
+        }
+
+        return true;
     }
 }
