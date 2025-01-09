@@ -188,4 +188,8 @@ public static class DomainError
         public static readonly Error NotExistProduct =
             new("Error.RedisCart.NotExistProduct", "Invalid product in redis cart. Product does not exist.");
     }
+
+    public static class Voucher
+    {
+    }
 }

@@ -32,4 +32,5 @@ public class ApplicationDbContext : DbContext
     public virtual DbSet<Group> Groups { get; set; }
     public virtual DbSet<OrderLog> OrderLogs { get; set; }
     public virtual DbSet<ProductImage> ProductImages { get; set; }
+    public virtual DbSet<Voucher> Vouchers { get; set; }
 }

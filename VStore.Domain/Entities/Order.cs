@@ -27,6 +27,7 @@ public class Order : EntityBase<Guid>, IDateTracking
     public PaymentMethod PaymentMethod { get; set; }
     public int? TransactionCode { get; set; }
     [Column(TypeName = "nvarchar(255)")] public string? ShippingCode { get; set; }
+    public Guid? VoucherId { get; set; }
     public DateTime CreatedDate { get; set; }
     public DateTime? ModifiedDate { get; set; }
     [ForeignKey(nameof(CustomerId))] public Guid CustomerId { get; set; }
@@ -34,4 +35,5 @@ public class Order : EntityBase<Guid>, IDateTracking
     public virtual Customer Customer { get; set; } = null!;
     public virtual ICollection<OrderDetail> OrderDetails { get; set; } = [];
     public virtual ICollection<OrderLog> OrderLogs { get; set; } = [];
+    public virtual Voucher? Voucher { get; set; }
 }
