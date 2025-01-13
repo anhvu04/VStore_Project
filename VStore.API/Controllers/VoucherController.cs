@@ -1,10 +1,14 @@
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using VStore.API.Common;
 using VStore.Application.Usecases.Voucher.Command.CreateVoucher;
 using VStore.Application.Usecases.Voucher.Command.DeleteVoucher;
 using VStore.Application.Usecases.Voucher.Command.UpdateVoucher;
 using VStore.Application.Usecases.Voucher.Query.GetVoucher;
 using VStore.Application.Usecases.Voucher.Query.GetVouchers;
+using VStore.Domain.AuthenticationScheme;
+using VStore.Domain.Enums;
 
 namespace VStore.API.Controllers;
 
@@ -12,6 +16,7 @@ namespace VStore.API.Controllers;
 public class VoucherController(ISender sender) : ApiController(sender)
 {
     [HttpGet]
+    [CacheResponseAttribute(600)]
     public async Task<IActionResult> GetVouchers([FromQuery] GetVouchersQuery query)
     {
         var result = await Sender.Send(query);
@@ -19,6 +24,7 @@ public class VoucherController(ISender sender) : ApiController(sender)
     }
 
     [HttpGet("{id}")]
+    [CacheResponseAttribute(600)]
     public async Task<IActionResult> GetVoucher(Guid id)
     {
         var result = await Sender.Send(new GetVoucherQuery(id));
@@ -26,6 +32,8 @@ public class VoucherController(ISender sender) : ApiController(sender)
     }
 
     [HttpPost]
+    [Authorize(AuthenticationSchemes = AuthenticationScheme.Access, Roles = nameof(Role.Admin))]
+    [InvalidateCache("/api/vouchers/")]
     public async Task<IActionResult> CreateVoucher([FromBody] CreateVoucherCommand command)
     {
         var result = await Sender.Send(command);
@@ -33,6 +41,8 @@ public class VoucherController(ISender sender) : ApiController(sender)
     }
 
     [HttpPatch("{id}")]
+    [Authorize(AuthenticationSchemes = AuthenticationScheme.Access, Roles = nameof(Role.Admin))]
+    [InvalidateCache("/api/vouchers/")]
     public async Task<IActionResult> UpdateVoucher(Guid id, [FromBody] UpdateVoucherCommand command)
     {
         command.Id = id;
@@ -41,6 +51,8 @@ public class VoucherController(ISender sender) : ApiController(sender)
     }
 
     [HttpDelete("{id}")]
+    [Authorize(AuthenticationSchemes = AuthenticationScheme.Access, Roles = nameof(Role.Admin))]
+    [InvalidateCache("/api/vouchers/")]
     public async Task<IActionResult> DeleteVoucher(Guid id)
     {
         var result = await Sender.Send(new DeleteVoucherCommand(id));

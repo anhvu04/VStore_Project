@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using VStore.Application.Abstractions.MediatR;
 using VStore.Application.Abstractions.PayOsService;
 using VStore.Application.Abstractions.VNPayService;
+using VStore.Application.CoreHelper;
 using VStore.Application.Models.PayOsService;
 using VStore.Application.Models.VnPayService;
 using VStore.Application.Usecases.Checkout.Common;
@@ -29,12 +30,13 @@ public class CheckoutCommandHandler : ICommandHandler<CheckoutCommand, CheckoutR
     private readonly IPayOsService _payOsService;
     private readonly IVnPayService _vnPayService;
     private readonly IOrderLogRepository _orderLogRepository;
+    private readonly IVoucherRepository _voucherRepository;
 
     public CheckoutCommandHandler(ICartRepository cartRepository, IUnitOfWork unitOfWork, IMapper mapper,
         ICustomerAddressRepository customerAddressRepository, IOrderRepository orderRepository,
         IOrderDetailRepository orderDetailRepository, ICartDetailRepository cartDetailRepository,
         IProductRepository productRepository, IPayOsService payOsService, IVnPayService vnPayService,
-        IOrderLogRepository orderLogRepository)
+        IOrderLogRepository orderLogRepository, IVoucherRepository voucherRepository)
     {
         _cartRepository = cartRepository;
         _unitOfWork = unitOfWork;
@@ -47,6 +49,7 @@ public class CheckoutCommandHandler : ICommandHandler<CheckoutCommand, CheckoutR
         _payOsService = payOsService;
         _vnPayService = vnPayService;
         _orderLogRepository = orderLogRepository;
+        _voucherRepository = voucherRepository;
     }
 
     public async Task<Result<CheckoutResponseModel>> Handle(CheckoutCommand request,
@@ -85,12 +88,35 @@ public class CheckoutCommandHandler : ICommandHandler<CheckoutCommand, CheckoutR
             return Result<CheckoutResponseModel>.Failure(DomainError.CommonError.NotFound(nameof(CustomerAddress)));
         }
 
+        int discountAmount = 0;
+        // add voucher
+        if (request.VoucherId != Guid.Empty)
+        {
+            var voucher = await _voucherRepository.FindByIdAsync(request.VoucherId, cancellationToken);
+            if (voucher == null)
+            {
+                return Result<CheckoutResponseModel>.Failure(DomainError.CommonError.NotFound(nameof(Voucher)));
+            }
+
+            HandleVoucher(cart.TotalPrice, voucher);
+            discountAmount = cart.TotalPrice.ApplyPercentage(voucher.DiscountPercentage);
+            if (discountAmount >= voucher.MaxDiscountAmount && voucher.MaxDiscountAmount != 0)
+            {
+                discountAmount = voucher.MaxDiscountAmount;
+            }
+
+            voucher.Quantity--;
+            _voucherRepository.Update(voucher);
+        }
+
+
         //add to order
         var order = new Domain.Entities.Order
         {
             TotalPrice = cart.TotalPrice,
+            DiscountAmount = discountAmount,
             ShippingFee = request.ShippingFee,
-            TotalAmount = cart.TotalPrice + request.ShippingFee,
+            TotalAmount = cart.TotalPrice - discountAmount + request.ShippingFee,
             TotalGram = cart.TotalGram,
             Note = request.Note,
             ReceiverName = customerAddress.ReceiverName,
@@ -220,6 +246,31 @@ public class CheckoutCommandHandler : ICommandHandler<CheckoutCommand, CheckoutR
         {
             CheckoutUrl = vnpayUrl.Data!.ToString()!
         });
+    }
+
+    private Result<CheckoutResponseModel> HandleVoucher(int totalPrice, Domain.Entities.Voucher voucher)
+    {
+        if (!voucher.IsActive)
+        {
+            return Result<CheckoutResponseModel>.Failure(DomainError.Voucher.VoucherNotActive);
+        }
+
+        if (voucher.ExpiryDate < DateTime.UtcNow)
+        {
+            return Result<CheckoutResponseModel>.Failure(DomainError.Voucher.VoucherExpired);
+        }
+
+        if (voucher.Quantity == 0)
+        {
+            return Result<CheckoutResponseModel>.Failure(DomainError.Voucher.VoucherOutOfStock);
+        }
+
+        if (totalPrice < voucher.MinPriceCondition)
+        {
+            return Result<CheckoutResponseModel>.Failure(DomainError.Voucher.TotalPriceNotEnough);
+        }
+
+        return Result<CheckoutResponseModel>.Success(new CheckoutResponseModel());
     }
 
     /// <summary>

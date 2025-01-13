@@ -1,4 +1,5 @@
 using System.Linq.Expressions;
+using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.AspNetCore.Http;
 
 namespace VStore.Application.CoreHelper;
@@ -54,6 +55,13 @@ public static class CoreHelper
         Expression<Func<T, object>> sortProperty)
     {
         return isDescending ? source.OrderByDescending(sortProperty) : source.OrderBy(sortProperty);
+    }
+
+    public static int ApplyPercentage(this int value, int percentage)
+    {
+        var result = value * (percentage / 100.0);
+        var roundedResult = Math.Round(result);
+        return Convert.ToInt32(roundedResult);
     }
 
     public static bool IsValidFileExtension(this string extension)
