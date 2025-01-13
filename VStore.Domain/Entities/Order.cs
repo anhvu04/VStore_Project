@@ -9,6 +9,7 @@ namespace VStore.Domain.Entities;
 public class Order : EntityBase<Guid>, IDateTracking
 {
     [Range(1, int.MaxValue)] public int TotalPrice { get; set; }
+    [Range(1, int.MaxValue)] public int DiscountAmount { get; set; }
     [Range(1, int.MaxValue)] public int ShippingFee { get; set; }
     [Range(1, int.MaxValue)] public int TotalAmount { get; set; }
     [Range(1, int.MaxValue)] public int TotalGram { get; set; }
