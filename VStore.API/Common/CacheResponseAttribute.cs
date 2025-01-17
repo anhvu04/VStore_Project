@@ -31,7 +31,7 @@ public class CacheResponseAttribute(int timeToLiveInSeconds) : Attribute, IAsync
             if (objectResult.Value != null)
             {
                 await requiredService.SetCacheResponseAsync(key, objectResult.Value,
-                    TimeSpan.FromMinutes(timeToLiveInSeconds));
+                    TimeSpan.FromSeconds(timeToLiveInSeconds));
             }
         }
     }
