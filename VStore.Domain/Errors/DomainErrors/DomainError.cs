@@ -188,4 +188,19 @@ public static class DomainError
         public static readonly Error NotExistProduct =
             new("Error.RedisCart.NotExistProduct", "Invalid product in redis cart. Product does not exist.");
     }
+
+    public static class Voucher
+    {
+        public static readonly Error VoucherNotActive =
+            new("Error.Voucher.NotActive", "Voucher is not active.");
+
+        public static readonly Error VoucherExpired =
+            new("Error.Voucher.Expired", "Voucher is expired.");
+
+        public static readonly Error VoucherOutOfStock =
+            new("Error.Voucher.OutOfStock", "Voucher is out of stock.");
+
+        public static readonly Error TotalPriceNotEnough =
+            new("Error.Voucher.TotalPriceNotEnough", "Total price is not enough to use this voucher.");
+    }
 }

@@ -12,5 +12,6 @@ public record CheckoutCommand : ICommand<CheckoutResponseModel>
     public Guid AddressId { get; init; }
     public int PaymentMethod { get; init; } = (int)Domain.Enums.PaymentMethod.Cod;
     public int ShippingFee { get; init; }
+    public Guid VoucherId { get; init; }
     public string? Note { get; init; }
 }
