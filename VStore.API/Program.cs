@@ -34,6 +34,30 @@ public class Program
 
         app.UseSwagger();
         app.UseSwaggerUI();
+        
+        // Enhanced ReDoc configuration
+        app.UseReDoc(c =>
+        {
+            c.DocumentTitle = "MakeMeBanana API Documentation";
+            c.SpecUrl = "/swagger/v1/swagger.json";
+            c.RoutePrefix = "docs/api"; // Set as default documentation
+            c.HeadContent = """
+                            
+                                                <style>
+                                                    /* Target operation summaries and headers in ReDoc */
+                                                    .operation-summary,
+                                                    [data-section-id] h1, 
+                                                    [data-section-id] h2,
+                                                    .redoc-markdown h1,
+                                                    .redoc-markdown h2 {
+                                                        font-weight: bold !important;
+                                                        color: rgb(50, 50, 159) !important;
+                                                                     }                   
+                                                </style>
+                                            
+                            """;
+        });
+        
         app.ApplyMigrations();
         app.UseStaticFiles(new StaticFileOptions
         {
