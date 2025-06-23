@@ -161,26 +161,37 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<IConnectionMultiplexer>(config =>
         {
             var env = configuration["ASPNETCORE_ENVIRONMENT"] ?? "Development";
-            string connectionString = "";
             if (env == "Development")
             {
-                connectionString = configuration.GetConnectionString("Redis")!;
+                var connectionString = configuration.GetConnectionString("Redis")!;
+                Console.WriteLine($"Redis Connection String: {connectionString}");
+                var redisConfig = ConfigurationOptions.Parse(connectionString, true);
+                redisConfig.AbortOnConnectFail = false;
+                redisConfig.ConnectTimeout = 10000;
+                redisConfig.SyncTimeout = 10000;
+                redisConfig.ConnectRetry = 3;
+                return ConnectionMultiplexer.Connect(redisConfig);
             }
-            else
+
+            var host = configuration["REDIS_HOST"] ?? "host.docker.internal";
+            var password = configuration["REDIS_PASSWORD"];
+            if (string.IsNullOrEmpty(password))
             {
-                var host = configuration["REDIS_HOST"] ?? "host.docker.internal";
-                var password = configuration["REDIS_PASSWORD"];
-                if (string.IsNullOrEmpty(password))
-                {
-                    throw new Exception("Redis password is not set");
-                }
-
-                connectionString = $"redis://default:{password}@{host}:6379";
+                throw new Exception("Redis password is not set");
             }
 
-            Console.WriteLine($"Redis Connection String: {connectionString}");
-            var redisConfig = ConfigurationOptions.Parse(connectionString, true);
-            return ConnectionMultiplexer.Connect(redisConfig);
+            // Use ConfigurationOptions instead of connection string to handle special characters
+            var options = new ConfigurationOptions
+            {
+                EndPoints = { { host, 6379 } },
+                User = "default",
+                Password = password,
+                AbortOnConnectFail = false,
+                ConnectTimeout = 10000,
+                SyncTimeout = 10000,
+                ConnectRetry = 3
+            };
+            return ConnectionMultiplexer.Connect(options);
         });
         services.AddSingleton<IRedisCartService, RedisCartService>();
         services.AddSingleton<IRedisCacheResponse, RedisCacheResponse>();
