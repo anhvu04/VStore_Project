@@ -175,7 +175,7 @@ public static class ServiceCollectionExtensions
                     throw new Exception("Redis password is not set");
                 }
 
-                connectionString = $"redis://{host}:6379,password={password}";
+                connectionString = $"redis://default:{password}@{host}:6379";
             }
 
             Console.WriteLine($"Redis Connection String: {connectionString}");
