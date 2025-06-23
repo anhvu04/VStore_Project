@@ -45,9 +45,9 @@ services:
   # api service
   vstore.api:
     image: ${DOCKER_USERNAME}/vstore:latest
-    #    build:
-    #      context: .
-    #      dockerfile: Dockerfile
+#    build:
+#      context: .
+#      dockerfile: Dockerfile
     restart: unless-stopped
     env_file:
       - .env
