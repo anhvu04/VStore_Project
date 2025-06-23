@@ -169,7 +169,13 @@ public static class ServiceCollectionExtensions
             else
             {
                 var host = configuration["REDIS_HOST"] ?? "host.docker.internal";
-                connectionString = $"{host}";
+                var password = configuration["REDIS_PASSWORD"];
+                if (string.IsNullOrEmpty(password))
+                {
+                    throw new Exception("Redis password is not set");
+                }
+
+                connectionString = $"redis://{host}:6379,password={password}";
             }
 
             Console.WriteLine($"Redis Connection String: {connectionString}");

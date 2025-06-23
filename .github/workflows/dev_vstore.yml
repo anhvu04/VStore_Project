@@ -47,12 +47,12 @@ jobs:
       - name: Build and deploy using Docker Compose
         uses: appleboy/ssh-action@v1.0.0
         with:
-          host: 157.66.218.185  # Địa chỉ IP của server
+          host: 128.199.181.178  # Địa chỉ IP của server
           username: root  # Tên người dùng SSH
           password: ${{ secrets.SSH_PASSWORD }}  # Mật khẩu SSH
           script: |
             # Di chuyển đến thư mục chứa project (có thể thay đổi theo project của bạn)
-            cd /home/panhvuu04/VStore/
+            cd /home/panhvuu04/vstore/
             
             # Tạo file .env từ secret ENV_PRODUCTION
             echo "${{ secrets.ENV_PRODUCTION }}" > .env
