@@ -1,4 +1,6 @@
+using CrystalQuartz.AspNetCore;
 using Microsoft.AspNetCore.StaticFiles;
+using Quartz;
 using Serilog;
 using VStore.API.DependencyInjection;
 using VStore.Infrastructure.SignalR.MessageHub;
@@ -65,9 +67,17 @@ public class Program
         app.UseAuthentication();
         app.UseAuthorization();
 
+        // Use for QuartzUI
+        var scheduler = app.Services.GetRequiredService<ISchedulerFactory>().GetScheduler().Result;
+        // app.MapGet("/quartz", context =>
+        // {
+        //     context.Response.Redirect("/quartz/");
+        //     return Task.CompletedTask;
+        // }).RequireAuthorization("Admin");
+
+        app.UseCrystalQuartz(() => scheduler);
 
         app.MapControllers();
-
         app.Run();
     }
 }
